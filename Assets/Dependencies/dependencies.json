@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "data_model": "dev"
+  },
+  "unityDependencies": [
+    "com.unity.editorcoroutines"
+  ]
+}
