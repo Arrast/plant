@@ -1,8 +1,12 @@
 {
   "dependencies": {
-    "data_model": "dev"
+    "data_model": "dev",
+    "scene_manager": "dev",
+    "asset_manager": "master",
+    "singleton": "master"
   },
   "unityDependencies": [
-    "com.unity.editorcoroutines"
+    "com.unity.editorcoroutines",
+    "com.unity.addressables"
   ]
 }

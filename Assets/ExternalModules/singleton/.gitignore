@@ -1,0 +1,10 @@
+TestingModuleWithoutUnityFiles/UnityPackageManager
+TestingModuleWithoutUnityFiles/ProjectSettings
+TestingModuleWithoutUnityFiles/Base For Modules.sln
+TestingModuleWithoutUnityFiles/Base For Modules.userprefs
+TestingModuleWithoutUnityFiles/obj/Debug/Assembly-CSharp.csproj.FilesWrittenAbsolute.txt
+TestingModuleWithoutUnityFiles/obj/Debug/Assembly-CSharp.dll
+TestingModuleWithoutUnityFiles/obj/Debug/Assembly-CSharp.dll.mdb
+*.sln
+UnityPackageManager
+ProjectSettings
