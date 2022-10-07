@@ -16,13 +16,13 @@ namespace versoft.plant.game_logic
         public long LastTimeUpdated;
 
         [JsonProperty("light")]
-        public float SavedLight = 1.0f;
+        public float Light = 1.0f;
 
         [JsonProperty("food")]
-        public float SavedFood = 1.0f;
+        public float Food = 1.0f;
 
         [JsonProperty("water")]
-        public float SavedWater = 1.0f;
+        public float Water = 1.0f;
 
         [JsonProperty("sick")]
         public bool Sick = false;
@@ -34,24 +34,33 @@ namespace versoft.plant.game_logic
                 PlantId = this.PlantId,
                 PlantInstanceId = this.PlantInstanceId,
                 LastTimeUpdated = this.LastTimeUpdated,
-                SavedLight = this.SavedLight,
-                SavedFood = this.SavedFood,
-                SavedWater = this.SavedWater,
+                Light = this.Light,
+                Food = this.Food,
+                Water = this.Water,
                 Sick = Sick
             };
             return clone;
         }
 
-        public void Tick(float timeElapsed)
-        {            
-            SavedFood = Math.Clamp(SavedFood - timeElapsed * Const.ResourceDepletionPerSecond, 0, Const.MaxPlantValue);
-            SavedLight = Math.Clamp(SavedLight - timeElapsed * Const.ResourceDepletionPerSecond, 0, Const.MaxPlantValue);
-            SavedWater = Math.Clamp(SavedWater - timeElapsed * Const.ResourceDepletionPerSecond, 0, Const.MaxPlantValue);
+        public void ModifyResource(PlantStat stat, float value)
+        {
+            switch (stat)
+            {
+                case PlantStat.Food:
+                    Food = Math.Clamp(Food - value, 0, Const.MaxPlantValue);
+                    break;
+                case PlantStat.Light:
+                    Light = Math.Clamp(Light - value, 0, Const.MaxPlantValue);
+                    break;
+                case PlantStat.Water:
+                    Water = Math.Clamp(Water - value, 0, Const.MaxPlantValue);
+                    break;
+            }
         }
 
         public override string ToString()
         {
-            return $"[{PlantId} - {PlantInstanceId}] Food: {SavedFood.ToString("F2")} | Water: {SavedWater.ToString("F2")} | Light: {SavedLight.ToString("F2")} | Sick {Sick}";
+            return $"[{PlantId} - {PlantInstanceId}] Food: {Food.ToString("F2")} | Water: {Water.ToString("F2")} | Light: {Light.ToString("F2")} | Sick {Sick}";
         }
     }
 }

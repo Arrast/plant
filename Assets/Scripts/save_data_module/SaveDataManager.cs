@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
@@ -7,6 +5,8 @@ namespace versoft.save_data
 {
     public class SaveDataManager
     {
+        private static string SaveFileName = "save.bin";
+
         public bool SaveData<T>(T objectToSave)
         {
             if (objectToSave == null)
@@ -20,13 +20,13 @@ namespace versoft.save_data
 #if !DEBUG || ENCRYPT_SAVE
         // Here is where we will encrypt the save.
 #endif
-            var path = Path.Combine(Application.persistentDataPath, "save.bin");
+            var path = Path.Combine(Application.persistentDataPath, SaveFileName);
             using (var streamWriter = new StreamWriter(path, false))
             {
                 streamWriter.Write(jsonString);
                 streamWriter.Close();
 
-                UnityEngine.Debug.LogError($"path: {path}");
+                Debug.Log($"Saving in path: {path}");
             }
 
             return true;
@@ -52,7 +52,7 @@ namespace versoft.save_data
                     }
                     catch (System.Exception e)
                     {
-                        UnityEngine.Debug.LogError($"Found an error: {e.Message}");
+                        Debug.LogError($"Found an error: {e.Message}");
                         return default;
                     }
                 }

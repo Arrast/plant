@@ -19,7 +19,7 @@ public class PlantManager : MonoBehaviour
     public float resourceIncreasingMultiplier = 3.0f;
 
 
-    public float GlobalResourceMultiplier = 100.0f;
+    public float GlobalResourceMultiplier = 50.0f;
 
     private PlantStat plantStatChanged = PlantStat.None;
 
@@ -51,21 +51,35 @@ public class PlantManager : MonoBehaviour
             LastTimeUpdated = epochTime,
             PlantId = plantId,
             PlantInstanceId = Guid.NewGuid().ToString(),
-            SavedFood = dataModel.Food,
-            SavedLight = dataModel.Light,
-            SavedWater = dataModel.Water
+            Food = dataModel.Food,
+            Light = dataModel.Light,
+            Water = dataModel.Water
         };
     }
 
     private void InitPlants(List<PlantSavedData> savedData)
     {
         if (savedData == null)
-        { return; }
+        { 
+            return; 
+        }
+
+        var gameDataProvider = ServiceLocator.Instance.Get<DataModelDatabase>();
+        if (gameDataProvider == null)
+        {
+            return;
+        }
 
         foreach (var plantSavedData in savedData)
         {
+            var plantModel = gameDataProvider.Get<PlantModel>(plantSavedData.PlantId);
+            if (plantModel == null)
+            {
+                continue;
+            }
+
             PlantLogic plantLogic = new PlantLogic();
-            plantLogic.Init(plantSavedData);
+            plantLogic.Init(plantSavedData, plantModel);
             _plants.Add(plantLogic);
         }
     }
@@ -80,7 +94,7 @@ public class PlantManager : MonoBehaviour
 
         if(plantStatChanged != PlantStat.None)
         {
-            _plants[selectedPlant].IncreaseStat(plantStatChanged, Time.deltaTime * resourceIncreasingMultiplier * GlobalResourceMultiplier);
+            _plants[selectedPlant].ModifyStat(plantStatChanged, Time.deltaTime * resourceIncreasingMultiplier * GlobalResourceMultiplier);
         }
 
         OnTick?.Invoke();

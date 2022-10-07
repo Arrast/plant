@@ -1,7 +1,4 @@
 
-using System;
-using UnityEditor.Experimental.GraphView;
-
 public static class Const
 {
     // The lifetime in Days
@@ -14,4 +11,7 @@ public static class Const
     // It should go from 1 to 0 in 3 hours. 
     public static float ResourceDepletionPerSecond = 1.0f / (HoursToDeplete * 3600);
     public static float MaxPlantValue = 2.0f;
+    public static float LowResourceThreshold = 0.25f;
+    public static float HighResourceThreshold = 1.1f;
+    public static float MaxPlantPercentage = 1.25f;
 }
