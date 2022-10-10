@@ -14,4 +14,5 @@ public static class Const
     public static float LowResourceThreshold = 0.25f;
     public static float HighResourceThreshold = 1.1f;
     public static float MaxPlantPercentage = 1.25f;
+    public static float MaxTimeInBadConditions = 600.0f;
 }

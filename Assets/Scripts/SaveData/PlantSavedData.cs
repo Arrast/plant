@@ -27,6 +27,18 @@ namespace versoft.plant.game_logic
         [JsonProperty("sick")]
         public bool Sick = false;
 
+        [JsonProperty("plant_lifetime")]
+        public float PlantLifetime = 0.0f;
+
+        [JsonProperty("plant_stage")]
+        public PlantStage PlantStage = PlantStage.Seedling;
+
+        [JsonProperty("time_in_bad_conditions")]
+        public float TimeInBadConditions = 0.0f;
+
+        [JsonProperty("alive")]
+        public bool Alive = true;
+
         public object Clone()
         {
             var clone = new PlantSavedData()
@@ -37,7 +49,11 @@ namespace versoft.plant.game_logic
                 Light = this.Light,
                 Food = this.Food,
                 Water = this.Water,
-                Sick = Sick
+                Sick = this.Sick,
+                PlantStage = this.PlantStage,
+                PlantLifetime = this.PlantLifetime,
+                TimeInBadConditions = this.TimeInBadConditions,
+                Alive = this.Alive
             };
             return clone;
         }

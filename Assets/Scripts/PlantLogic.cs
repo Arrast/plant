@@ -12,6 +12,13 @@ namespace versoft.plant.game_logic
         Food
     }
 
+    public enum PlantStage
+    {
+        Seedling = 0,
+        Bud,
+        Grown
+    }
+
     public class PlantLogic
     {
         private PlantSavedData _plantSavedData;
@@ -38,8 +45,8 @@ namespace versoft.plant.game_logic
             {
                 case PlantStat.Light:
                     // Here we will check the Day / Night cycle
-                    
-                    break;
+                    // For now, let's just leave them all decreasing.
+                    // break;
                 case PlantStat.Water:
                 case PlantStat.Food:
                     value *= -1;
@@ -48,11 +55,74 @@ namespace versoft.plant.game_logic
             return value;
         }
 
+        private void CheckPlantConditions(float timeElapsed)
+        {
+            bool plantInBadConditions = false;
+            if (_plantSavedData.Sick)
+            {
+                plantInBadConditions = true;
+            }
+
+            foreach (PlantStat stat in Enum.GetValues(typeof(PlantStat)))
+            {
+                if(stat == PlantStat.None) 
+                { continue; }
+
+                float baseValue = GetStatValue(stat, _plantModel);
+                float value = GetStatValue(stat, _plantSavedData);
+                if(value < baseValue * Const.LowResourceThreshold || value > baseValue * Const.HighResourceThreshold)
+                {
+                    plantInBadConditions = true;
+                    UnityEngine.Debug.LogError("Que se muere! Que se muere!");
+                }                
+            }
+
+            if (plantInBadConditions)
+            {
+                _plantSavedData.TimeInBadConditions += timeElapsed;
+                if(_plantSavedData.TimeInBadConditions > Const.MaxTimeInBadConditions)
+                {
+                    // Plant Pepsi
+                    PlantDead();
+                }
+            }
+        }
+
+        private void PlantDead()
+        {
+            UnityEngine.Debug.LogError("Se murio");
+            _plantSavedData.Alive = false;
+        }
+
         public void Tick(float timeElapsed)
         {
+            if (!_plantSavedData.Alive) 
+            { 
+                return; 
+            }
+
             TickPlantStat(PlantStat.Light, timeElapsed * Const.ResourceDepletionPerSecond);
             TickPlantStat(PlantStat.Water, timeElapsed * Const.ResourceDepletionPerSecond);
             TickPlantStat(PlantStat.Food,  timeElapsed * Const.ResourceDepletionPerSecond);
+            IncreaseLifetime(timeElapsed);
+            CheckPlantConditions(timeElapsed);
+        }
+
+        private void IncreaseLifetime(float timeElapsed)
+        {
+            if(_plantSavedData.PlantStage != PlantStage.Grown)
+            {
+                int plantStage = (int)_plantSavedData.PlantStage;
+                float previousMinTime = (plantStage == 0) ? 0: _plantModel.LevelUpTimes[0];
+                float timeToLevelUp = _plantModel.LevelUpTimes[plantStage] + previousMinTime;
+               
+                if (_plantSavedData.PlantLifetime < timeToLevelUp && _plantSavedData.PlantLifetime + timeElapsed >= timeToLevelUp)
+                {
+                    _plantSavedData.PlantStage += 1;
+                }
+            }
+
+            _plantSavedData.PlantLifetime += timeElapsed;
         }
 
         private void TickPlantStat(PlantStat stat, float timeElapsed)

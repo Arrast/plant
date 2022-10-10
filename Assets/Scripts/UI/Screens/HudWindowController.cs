@@ -35,7 +35,6 @@ public class HudWindowController : WindowController
         _plantManager = ServiceLocator.Instance.Get<PlantManager>();
         if (_plantManager != null)
         {
-
             _plantManager.OnTick += UpdatePlantStats;
         }
         return base.Init(windowConfig);
