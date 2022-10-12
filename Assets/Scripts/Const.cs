@@ -1,6 +1,9 @@
 
 public static class Const
 {
+    public const string PrefabsFolder = "Prefabs/";
+    public const string AnimationFolder = "Animations/";
+
     // The lifetime in Days
     public static float PlantLifetime = 3;
 

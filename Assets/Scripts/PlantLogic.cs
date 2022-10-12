@@ -24,6 +24,8 @@ namespace versoft.plant.game_logic
         private PlantSavedData _plantSavedData;
         private PlantModel _plantModel;
         private Dictionary<PlantStat, Func<float>> _plantStatModifiers = new Dictionary<PlantStat, Func<float>>();
+        public System.Action<string, PlantStage> OnPlantGrew;
+        public System.Action<string, bool> OnPlantDied;
 
         public void Init(PlantSavedData plantSavedData, PlantModel plantModel)
         {
@@ -90,8 +92,8 @@ namespace versoft.plant.game_logic
 
         private void PlantDead()
         {
-            UnityEngine.Debug.LogError("Se murio");
             _plantSavedData.Alive = false;
+            OnPlantDied?.Invoke(_plantSavedData.PlantInstanceId, _plantSavedData.Alive);
         }
 
         public void Tick(float timeElapsed)
@@ -118,7 +120,8 @@ namespace versoft.plant.game_logic
                
                 if (_plantSavedData.PlantLifetime < timeToLevelUp && _plantSavedData.PlantLifetime + timeElapsed >= timeToLevelUp)
                 {
-                    _plantSavedData.PlantStage += 1;
+                    _plantSavedData.PlantStage += 1; 
+                    OnPlantGrew?.Invoke(_plantSavedData.PlantInstanceId, _plantSavedData.PlantStage);
                 }
             }
 

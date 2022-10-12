@@ -11,19 +11,29 @@ public class PlantManager : MonoBehaviour
 {
     private List<PlantLogic> _plants = new List<PlantLogic>();
     private List<PlantSavedData> _plantSavedData;
-    
+
     // This will be necessary when we have multiple plants.
-    private int selectedPlant = 0;
+    private int selectedPlant = -1;
 
     // This may be specified somewhere else.
     public float resourceIncreasingMultiplier = 3.0f;
 
-
-    public float GlobalResourceMultiplier = 50.0f;
+    public float GlobalResourceMultiplier = 500.0f;
 
     private PlantStat plantStatChanged = PlantStat.None;
+    
+    public PlantLogic SelectedPlant
+    {
+        get
+        {
+            if (selectedPlant < 0) { return null; }
+            if (selectedPlant >= _plants.Count) { return null; }
+            return _plants[selectedPlant];
+        }
+    }
 
     public Action OnTick { get; set; }
+    public Action<PlantLogic> OnPlantSelected { get; set; }
 
     private PlantSavedData CreatePlant(string plantId)
     {
@@ -60,8 +70,8 @@ public class PlantManager : MonoBehaviour
     private void InitPlants(List<PlantSavedData> savedData)
     {
         if (savedData == null)
-        { 
-            return; 
+        {
+            return;
         }
 
         var gameDataProvider = ServiceLocator.Instance.Get<DataModelDatabase>();
@@ -92,7 +102,7 @@ public class PlantManager : MonoBehaviour
             plant.Tick(Time.deltaTime * GlobalResourceMultiplier);
         }
 
-        if(plantStatChanged != PlantStat.None)
+        if (plantStatChanged != PlantStat.None)
         {
             _plants[selectedPlant].ModifyStat(plantStatChanged, Time.deltaTime * resourceIncreasingMultiplier * GlobalResourceMultiplier);
         }
@@ -100,19 +110,19 @@ public class PlantManager : MonoBehaviour
         OnTick?.Invoke();
     }
 
-    public void Init(PlayerSaveData playerSaveData)
+    public void LoadPlantsFromSaveData(PlayerSaveData playerSaveData)
     {
         _plantSavedData = new List<PlantSavedData>();
-        foreach(var plant in playerSaveData.PlantStates)
+        foreach (var plant in playerSaveData.PlantStates)
         {
-            _plantSavedData.Add((PlantSavedData) plant.Clone());
+            _plantSavedData.Add((PlantSavedData)plant.Clone());
         }
         InitPlants(_plantSavedData);
     }
 
     public void SetResourceState(PlantStat plantStat, bool increasing)
     {
-        if(selectedPlant < 0)
+        if (selectedPlant < 0)
         {
             return;
         }
@@ -123,7 +133,7 @@ public class PlantManager : MonoBehaviour
     public List<PlantSavedData> GetPlants()
     {
         _plantSavedData = new List<PlantSavedData>();
-        foreach(var plant in _plants)
+        foreach (var plant in _plants)
         {
             _plantSavedData.Add(plant.GetPlantSaveData());
         }
@@ -131,10 +141,26 @@ public class PlantManager : MonoBehaviour
         return _plantSavedData;
     }
 
-    public PlantLogic GetSelectedPlant()
+    public List<PlantLogic> GetAllPlantLogic()
     {
-        if(selectedPlant < 0) { return null; }
-        if(selectedPlant >= _plants.Count) { return null; }
-        return _plants[selectedPlant];
+        return _plants;
+    }
+
+    public void SelectPlant(string plantId)
+    {
+        for(int i = 0; i < _plantSavedData.Count; i++)
+        {
+            if (_plantSavedData[i].PlantInstanceId == plantId)
+            {
+                selectedPlant = i;
+            }
+        }
+    }
+
+    public void DeselectPlant()
+    {
+        selectedPlant = -1;
+
+        OnPlantSelected?.Invoke(SelectedPlant);
     }
 }

@@ -27,7 +27,7 @@ public class PlayerManager
         }
 
         var plantManager = ServiceLocator.Instance.Get<PlantManager>();
-        plantManager.Init(_playerSaveData);
+        plantManager.LoadPlantsFromSaveData(_playerSaveData);
     }
 
     public void SaveToFile()

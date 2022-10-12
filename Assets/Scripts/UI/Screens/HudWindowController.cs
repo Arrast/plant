@@ -16,6 +16,9 @@ public class HudWindowController : WindowController
     [SerializeField]
     private GameObject plantResourceContainer;
 
+    [SerializeField]
+    private GameObject deselectPlantButton;
+
     private Dictionary<PlantStat, ResourceUIWidget> _resourceWidgets = new Dictionary<PlantStat, ResourceUIWidget>();
 
     protected override void Awake()
@@ -36,14 +39,28 @@ public class HudWindowController : WindowController
         if (_plantManager != null)
         {
             _plantManager.OnTick += UpdatePlantStats;
+            _plantManager.OnPlantSelected += PlantSelected;
         }
         return base.Init(windowConfig);
     }
 
+    private void PlantSelected(PlantLogic selectedPlant)
+    {
+        UpdatePlantStats();
+    }
+
+    public void DeselectPlant()
+    {
+        var gameManager = ServiceLocator.Instance.Get<GameManager>();
+        gameManager.DeselectPlant();
+    }
+
     private void UpdatePlantStats()
     {
-        PlantLogic selectedPlant = _plantManager.GetSelectedPlant();
+        PlantLogic selectedPlant = _plantManager.SelectedPlant;
         plantResourceContainer.SafeSetActive(selectedPlant != null);
+        deselectPlantButton.SafeSetActive(selectedPlant != null);
+
         if (selectedPlant == null)
         {
             return;

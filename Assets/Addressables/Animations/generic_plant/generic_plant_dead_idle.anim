@@ -6,7 +6,7 @@ AnimationClip:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: generic_plant_bud_dead
+  m_Name: generic_plant_dead_idle
   serializedVersion: 6
   m_Legacy: 0
   m_Compressed: 0

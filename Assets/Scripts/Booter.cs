@@ -29,6 +29,8 @@ public class Booter : MonoBehaviour
         var gameManager = gameManagerGameObject.AddComponent<GameManager>();
         gameManager.Init();
 
+        ServiceLocator.Instance.Register(gameManager);
+
         // Open the Hud
         windowManager.OpenScreen("1.0_HUD", UILayers.Screen);
     }
