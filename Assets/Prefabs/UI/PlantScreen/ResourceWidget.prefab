@@ -52,7 +52,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   plantResource: 1
-  resourceIcon: {fileID: 1994853276427972526}
+  resourceIcon: {fileID: 3224889242555257470}
   resourceProgressBar: {fileID: 8771946718181459756}
 --- !u!1 &3106891404416681869
 GameObject:
@@ -218,6 +218,7 @@ GameObject:
   - component: {fileID: 8796897792552831616}
   - component: {fileID: 1994853276427972526}
   - component: {fileID: 835223976853672366}
+  - component: {fileID: 3224889242555257470}
   m_Layer: 0
   m_Name: ResourceIcon
   m_TagString: Untagged
@@ -297,6 +298,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_AspectMode: 2
   m_AspectRatio: 1
+--- !u!114 &3224889242555257470
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6978983382394532860}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: deedc3d29e378fe4c879035dd3e87c0d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  resourceIcon: {fileID: 1994853276427972526}
 --- !u!1 &7152667395954444775
 GameObject:
   m_ObjectHideFlags: 0

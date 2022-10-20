@@ -58,7 +58,8 @@ namespace versoft.asset_manager
 
         private async Task<T> GetAsset<T>(string path, string extension) where T : Object
         {
-            if (_cache.TryGetValue(path, out var cachedElement))
+            Object cachedElement;
+            if (_cache.TryGetValue(path, out cachedElement))
             {
                 return cachedElement as T;
             }
@@ -70,6 +71,10 @@ namespace versoft.asset_manager
                 await assetLoadingHandle.Task;
                 if (assetLoadingHandle.Status == UnityEngine.ResourceManagement.AsyncOperations.AsyncOperationStatus.Succeeded)
                 {
+                    if (_cache.TryGetValue(path, out cachedElement))
+                    {
+                        return cachedElement as T;
+                    }
                     _cache.Add(path, assetLoadingHandle.Result);
                     return assetLoadingHandle.Result as T;
                 }

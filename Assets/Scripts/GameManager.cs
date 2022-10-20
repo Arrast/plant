@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour
     private PlantManager _plantManager;
     private PlantLayoutManager _plantLayoutManager;
     private CameraManager _cameraManager;
+    private MainSceneInitializer _mainSceneComponents;
 
     public void Init()
     {
@@ -24,10 +25,12 @@ public class GameManager : MonoBehaviour
     {
         _cameraManager = gameObject.AddComponent<CameraManager>();
         _plantLayoutManager = GameObject.FindObjectOfType<PlantLayoutManager>();
-        if(_plantLayoutManager == null) 
+        _mainSceneComponents = GameObject.FindObjectOfType<MainSceneInitializer>();
+        if (_plantLayoutManager == null || _mainSceneComponents == null) 
         { return; }
 
         _plantLayoutManager.Initialize();
+        _mainSceneComponents.Initialize();
     }
 
     private void Update()

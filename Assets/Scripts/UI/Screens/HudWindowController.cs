@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -14,22 +15,48 @@ public class HudWindowController : WindowController
     private List<ResourceUIWidget> plantResourceWidgets;
 
     [SerializeField]
-    private GameObject plantResourceContainer;
+    private List<ResourceUpdateWidget> plantIncreaseResourceWidgets;
 
     [SerializeField]
-    private GameObject deselectPlantButton;
+    private GameObject selectedPlantOverlay;
+
 
     private Dictionary<PlantStat, ResourceUIWidget> _resourceWidgets = new Dictionary<PlantStat, ResourceUIWidget>();
 
     protected override void Awake()
     {
         base.Awake();
-        if (plantResourceWidgets == null)
-        { return; }
-
-        foreach (var resourceWidget in plantResourceWidgets)
+        if (plantResourceWidgets != null)
         {
-            _resourceWidgets.Add(resourceWidget.PlantResource, resourceWidget);
+
+            foreach (var resourceWidget in plantResourceWidgets)
+            {
+                _resourceWidgets.Add(resourceWidget.PlantResource, resourceWidget);
+            }
+        }
+
+        if (plantIncreaseResourceWidgets != null)
+        {
+            foreach (var plantIncreaseWidget in plantIncreaseResourceWidgets)
+            {
+                plantIncreaseWidget.Init(StartIncreaseResource, StopIncreasingResource);
+            }
+        }
+    }
+
+    private void StartIncreaseResource(PlantStat plantStat)
+    {
+        if (_plantManager != null)
+        {
+            _plantManager.SetResourceState(plantStat, true);
+        }
+    }
+
+    private void StopIncreasingResource(PlantStat plantStat)
+    {
+        if (_plantManager != null)
+        {
+            _plantManager.SetResourceState(plantStat, false);
         }
     }
 
@@ -58,15 +85,14 @@ public class HudWindowController : WindowController
     private void UpdatePlantStats()
     {
         PlantLogic selectedPlant = _plantManager.SelectedPlant;
-        plantResourceContainer.SafeSetActive(selectedPlant != null);
-        deselectPlantButton.SafeSetActive(selectedPlant != null);
+        selectedPlantOverlay.SafeSetActive(selectedPlant != null);
 
         if (selectedPlant == null)
         {
             return;
         }
 
-        foreach(var pair in _resourceWidgets)
+        foreach (var pair in _resourceWidgets)
         {
             float resourceValue = selectedPlant.GetStatValue(pair.Key);
             pair.Value.SetResourceValue(resourceValue);

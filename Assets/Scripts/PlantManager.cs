@@ -16,9 +16,9 @@ public class PlantManager : MonoBehaviour
     private int selectedPlant = -1;
 
     // This may be specified somewhere else.
-    public float resourceIncreasingMultiplier = 3.0f;
+    public float resourceIncreasingMultiplier = 1000.0f;
 
-    public float GlobalResourceMultiplier = 500.0f;
+    public float GlobalResourceMultiplier = 1.0f;
 
     private PlantStat plantStatChanged = PlantStat.None;
     
@@ -104,7 +104,7 @@ public class PlantManager : MonoBehaviour
 
         if (plantStatChanged != PlantStat.None)
         {
-            _plants[selectedPlant].ModifyStat(plantStatChanged, Time.deltaTime * resourceIncreasingMultiplier * GlobalResourceMultiplier);
+            _plants[selectedPlant].ModifyStat(plantStatChanged, Time.deltaTime * resourceIncreasingMultiplier * GlobalResourceMultiplier * Const.ResourceDepletionPerSecond);
         }
 
         OnTick?.Invoke();

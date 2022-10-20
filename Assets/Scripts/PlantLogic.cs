@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using versoft.asset_manager;
 
 namespace versoft.plant.game_logic
 {
@@ -26,11 +27,13 @@ namespace versoft.plant.game_logic
         private Dictionary<PlantStat, Func<float>> _plantStatModifiers = new Dictionary<PlantStat, Func<float>>();
         public System.Action<string, PlantStage> OnPlantGrew;
         public System.Action<string, bool> OnPlantDied;
+        private GameTimeManager _gameTimeManager;
 
         public void Init(PlantSavedData plantSavedData, PlantModel plantModel)
         {
             _plantSavedData = (PlantSavedData)plantSavedData.Clone();
             _plantModel = plantModel;
+            _gameTimeManager = ServiceLocator.Instance.Get<GameTimeManager>();
         }
 
         private float GetStatChangeForPlantStat(PlantStat stat, float timeElapsed)
@@ -46,9 +49,16 @@ namespace versoft.plant.game_logic
             switch (stat)
             {
                 case PlantStat.Light:
-                    // Here we will check the Day / Night cycle
-                    // For now, let's just leave them all decreasing.
-                    // break;
+                    var time = _gameTimeManager.GetTimeOfDayFromTime();
+                    if(time == TimeOfDayEnum.Night)
+                    {
+                        value *= -1;
+                    }
+                    else if (time == TimeOfDayEnum.Dawn || time == TimeOfDayEnum.Dusk) 
+                    { 
+                        value = 0;
+                    }
+                    break;
                 case PlantStat.Water:
                 case PlantStat.Food:
                     value *= -1;

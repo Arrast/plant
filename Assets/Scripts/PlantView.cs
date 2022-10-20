@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -13,12 +14,25 @@ public class PlantView : MonoBehaviour
     [SerializeField]
     private SpriteButton spriteButton;
 
+    [SerializeField]
+    private FakeShadow shadowComponent;
+
+    [SerializeField]
+    private SpriteRenderer sunScreen;
+
     private string _plantId;
+    private GameTimeManager _gameTimeManager;
 
     public async void Initialize(PlantSavedData plantSavedData)
     {
         if (plantAnimator == null)
         { return; }
+
+        _gameTimeManager = ServiceLocator.Instance.Get<GameTimeManager>();
+        if (_gameTimeManager == null)
+        { return; }
+
+        _gameTimeManager.SetOnTimeOfDayChangedListener(UpdateShadow);
 
         var assetManager = ServiceLocator.Instance.Get<AssetManager>();
         if (assetManager == null)
@@ -35,6 +49,34 @@ public class PlantView : MonoBehaviour
 
         SetPlantStage(plantSavedData.PlantStage);
         SetPlantAlive(plantSavedData.Alive);
+        UpdateShadow(_gameTimeManager.GetTimeOfDayFromTime());
+        SetSunScreen(false);
+    }
+
+    private void UpdateShadow(TimeOfDayEnum timeOfDay)
+    {
+        SetShadow(timeOfDay == TimeOfDayEnum.Night || timeOfDay == TimeOfDayEnum.Dawn);
+    }
+
+    public void SetShadow(bool enabled)
+    {
+        if (shadowComponent != null)
+        {
+            shadowComponent.ToggleShadow(enabled);
+        }
+    }
+
+    private void SetSunScreen(bool enabled)
+    {
+        sunScreen.SafeSetActive(enabled);
+        if (!enabled)
+        {
+            UpdateShadow(_gameTimeManager.GetTimeOfDayFromTime());
+        }
+        else
+        {
+            SetShadow(true);
+        }
     }
 
     public void SetPlantStage(PlantStage plantStage)
@@ -50,7 +92,7 @@ public class PlantView : MonoBehaviour
     public void OnClick()
     {
         var gameManager = ServiceLocator.Instance.Get<GameManager>();
-        if(gameManager == null) 
+        if (gameManager == null)
         { return; }
 
         gameManager.SelectPlant(_plantId);
@@ -60,5 +102,11 @@ public class PlantView : MonoBehaviour
     public void ResetButtonState()
     {
         spriteButton.SetInteractable(true);
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.A)) { SetSunScreen(true); }
+        if (Input.GetKeyDown(KeyCode.S)) { SetSunScreen(false); }
     }
 }

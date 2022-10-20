@@ -23,13 +23,19 @@ public class Booter : MonoBehaviour
         ServiceLocator.Instance.RegisterMonoBehaviour<PlantManager>();
         ServiceLocator.Instance.Register<PlayerManager>();
 
-        // Add the game manager... May not be here
         GameObject gameManagerGameObject = new GameObject("Game Manager");
         DontDestroyOnLoad(gameManagerGameObject);
+
+        // Add the time manager
+        var gameTimeManager = gameManagerGameObject.AddComponent<GameTimeManager>();
+        ServiceLocator.Instance.Register(gameTimeManager);
+
+        // Add the game manager... May not be here
         var gameManager = gameManagerGameObject.AddComponent<GameManager>();
         gameManager.Init();
 
         ServiceLocator.Instance.Register(gameManager);
+
 
         // Open the Hud
         windowManager.OpenScreen("1.0_HUD", UILayers.Screen);

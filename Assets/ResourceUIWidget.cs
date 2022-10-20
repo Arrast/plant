@@ -9,26 +9,20 @@ public class ResourceUIWidget : MonoBehaviour
     private PlantStat plantResource;
 
     [SerializeField]
-    private Image resourceIcon;
+    private ResourceIcon resourceIcon;
 
     [SerializeField]
     private Image resourceProgressBar;
 
     public PlantStat PlantResource => plantResource;
 
-    public async void Start()
+    public void Start()
     {
         SetResourceValue(0);
-        var assetManager = ServiceLocator.Instance.Get<AssetManager>();
-        if(assetManager == null) 
+        if(resourceIcon == null) 
         { return; }
 
-        string resourcePath = $"Sprites/UI/resource_{plantResource.ToString().ToLower()}";
-        var sprite = await assetManager.LoadAsset<Sprite>(resourcePath);
-        if(sprite != null)
-        {
-            resourceIcon.sprite = sprite;
-        }
+        resourceIcon.Init(plantResource);
     }
 
     public void SetResourceValue(float value)

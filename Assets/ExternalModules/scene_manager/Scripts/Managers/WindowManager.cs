@@ -24,6 +24,7 @@ namespace versoft.scene_manager
         [SerializeField]
         private LayerController layerController;
 
+        public Canvas MainCanvas { get; private set; }
         private Stack<WindowHistory> windowStack = new Stack<WindowHistory>();
         private Dictionary<string, LoadingScreenWindowController> _loadingScreens = new Dictionary<string, LoadingScreenWindowController>();
 
@@ -32,6 +33,7 @@ namespace versoft.scene_manager
         {
             DontDestroyOnLoad(gameObject);
             assetManager = ServiceLocator.Instance.Get<AssetManager>();
+            MainCanvas = GetComponentInChildren<Canvas>();
             GetLoadingScreens();
         }
 
