@@ -45,7 +45,6 @@ namespace versoft.plant.game_logic
             }
 
             float value = timeElapsed * multiplier;
-
             switch (stat)
             {
                 case PlantStat.Light:
@@ -190,6 +189,16 @@ namespace versoft.plant.game_logic
 
                 field.SetValue(_plantSavedData, value);
             }
+        }
+
+        public void AddModifierForStat(PlantStat plantStat, Func<float> modifierFunction)
+        {
+            _plantStatModifiers.Add(plantStat, modifierFunction);
+        }
+
+        public void RemoveModifierForStat(PlantStat plantStat)
+        {
+            _plantStatModifiers.Remove(plantStat);
         }
     }
 }

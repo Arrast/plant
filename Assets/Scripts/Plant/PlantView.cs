@@ -66,7 +66,7 @@ public class PlantView : MonoBehaviour
         }
     }
 
-    private void SetSunScreen(bool enabled)
+    public void SetSunScreen(bool enabled)
     {
         sunScreen.SafeSetActive(enabled);
         if (!enabled)
@@ -102,11 +102,5 @@ public class PlantView : MonoBehaviour
     public void ResetButtonState()
     {
         spriteButton.SetInteractable(true);
-    }
-
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.A)) { SetSunScreen(true); }
-        if (Input.GetKeyDown(KeyCode.S)) { SetSunScreen(false); }
     }
 }

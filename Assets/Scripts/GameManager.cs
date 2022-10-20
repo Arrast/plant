@@ -79,4 +79,18 @@ public class GameManager : MonoBehaviour
         _cameraManager.ResetCameraValues();
         _plantLayoutManager.ResetPlantWidgets();
     }
+
+    public void ToggleResourceOnPlantView(string plantInstanceId, PlantStat plantStat, bool isOn)
+    {
+        var plantView = _plantLayoutManager.GetPlantViewForPlantId(plantInstanceId);
+        if (plantView == null)
+        { return; }
+
+        switch (plantStat)
+        {
+            case PlantStat.Light:
+                plantView.SetSunScreen(isOn);
+                break;
+        }
+    }
 }

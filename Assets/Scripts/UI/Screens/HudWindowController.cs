@@ -1,5 +1,3 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -9,6 +7,7 @@ using versoft.scene_manager;
 
 public class HudWindowController : WindowController
 {
+    private GameManager _gameManager;
     private PlantManager _plantManager;
 
     [SerializeField]
@@ -16,6 +15,9 @@ public class HudWindowController : WindowController
 
     [SerializeField]
     private List<ResourceUpdateWidget> plantIncreaseResourceWidgets;
+
+    [SerializeField]
+    private List<ResourceToggleWidget> plantResourceToggleWidgets;
 
     [SerializeField]
     private GameObject selectedPlantOverlay;
@@ -28,7 +30,6 @@ public class HudWindowController : WindowController
         base.Awake();
         if (plantResourceWidgets != null)
         {
-
             foreach (var resourceWidget in plantResourceWidgets)
             {
                 _resourceWidgets.Add(resourceWidget.PlantResource, resourceWidget);
@@ -42,6 +43,27 @@ public class HudWindowController : WindowController
                 plantIncreaseWidget.Init(StartIncreaseResource, StopIncreasingResource);
             }
         }
+
+        if (plantResourceToggleWidgets != null)
+        {
+            foreach (var widget in plantResourceToggleWidgets)
+            {
+                widget.Init(false, OnResourceToggleChanged);
+            }
+        }
+    }
+
+    private void OnResourceToggleChanged(PlantStat plantStat, bool isOn)
+    {
+        if (_plantManager == null || _gameManager == null)
+        { return; }
+
+        PlantLogic selectedPlant = _plantManager.SelectedPlant;
+        if (selectedPlant == null)
+        { return; }
+
+        _plantManager.ToggleResourceModifier(plantStat, isOn);
+        _gameManager.ToggleResourceOnPlantView(selectedPlant.GetPlantSaveData().PlantInstanceId, plantStat, isOn);
     }
 
     private void StartIncreaseResource(PlantStat plantStat)
@@ -62,6 +84,7 @@ public class HudWindowController : WindowController
 
     public override Task Init(WindowConfig windowConfig)
     {
+        _gameManager = ServiceLocator.Instance.Get<GameManager>();
         _plantManager = ServiceLocator.Instance.Get<PlantManager>();
         if (_plantManager != null)
         {
@@ -78,8 +101,7 @@ public class HudWindowController : WindowController
 
     public void DeselectPlant()
     {
-        var gameManager = ServiceLocator.Instance.Get<GameManager>();
-        gameManager.DeselectPlant();
+        _gameManager.DeselectPlant();
     }
 
     private void UpdatePlantStats()

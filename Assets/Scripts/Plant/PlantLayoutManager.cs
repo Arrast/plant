@@ -102,4 +102,9 @@ public class PlantLayoutManager : MonoBehaviour
             plantView.ResetButtonState();
         }
     }
+
+    public void ToggleResourceOnPlantView(string plantInstanceId, PlantStat plantStat, bool isOn)
+    {
+        throw new NotImplementedException();
+    }
 }

@@ -42,8 +42,6 @@ public class GameTimeManager : MonoBehaviour
         var totalSeconds = DateTime.UtcNow.TimeOfDay.TotalSeconds;
         _currentDateTime = _currentDateTime.AddSeconds(totalSeconds * TimeMultiplier);
 
-        _currentDateTime = new DateTime(2022, 10, 22, 21, 58, 00);
-
         StartCoroutine(Tick());
     }
 

@@ -1,3 +1,4 @@
+using Mono.Cecil.Cil;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -21,7 +22,7 @@ public class PlantManager : MonoBehaviour
     public float GlobalResourceMultiplier = 1.0f;
 
     private PlantStat plantStatChanged = PlantStat.None;
-    
+
     public PlantLogic SelectedPlant
     {
         get
@@ -104,7 +105,7 @@ public class PlantManager : MonoBehaviour
 
         if (plantStatChanged != PlantStat.None)
         {
-            _plants[selectedPlant].ModifyStat(plantStatChanged, Time.deltaTime * resourceIncreasingMultiplier * GlobalResourceMultiplier * Const.ResourceDepletionPerSecond);
+            SelectedPlant?.ModifyStat(plantStatChanged, Time.deltaTime * resourceIncreasingMultiplier * GlobalResourceMultiplier * Const.ResourceDepletionPerSecond);
         }
 
         OnTick?.Invoke();
@@ -148,7 +149,7 @@ public class PlantManager : MonoBehaviour
 
     public void SelectPlant(string plantId)
     {
-        for(int i = 0; i < _plantSavedData.Count; i++)
+        for (int i = 0; i < _plantSavedData.Count; i++)
         {
             if (_plantSavedData[i].PlantInstanceId == plantId)
             {
@@ -162,5 +163,44 @@ public class PlantManager : MonoBehaviour
         selectedPlant = -1;
 
         OnPlantSelected?.Invoke(SelectedPlant);
+    }
+
+    public void ToggleResourceModifier(PlantStat plantStat, bool isOn)
+    {
+        if (isOn)
+        {
+            var modifierFunction = GetModifierForStat(plantStat);
+            if (modifierFunction != null)
+            {
+                SelectedPlant?.AddModifierForStat(plantStat, modifierFunction);
+            }
+        }
+        else
+        {
+            SelectedPlant?.RemoveModifierForStat(plantStat);
+        }
+    }
+
+    private Func<float> GetModifierForStat(PlantStat plantStat)
+    {
+        switch (plantStat)
+        {
+            case PlantStat.Light:
+                {
+                    return PlantLightModifier;
+                }
+            default:
+                return null;
+        }
+    }
+
+    public float PlantLightModifier()
+    {
+        var gameTimeManager = ServiceLocator.Instance.Get<GameTimeManager>();
+        if (gameTimeManager.GetTimeOfDayFromTime() == TimeOfDayEnum.Day)
+        {
+            return 0.5f;
+        }
+        return 1.0f;
     }
 }

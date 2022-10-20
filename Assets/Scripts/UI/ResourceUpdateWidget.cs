@@ -1,7 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using versoft.plant.game_logic;
 
 public class ResourceUpdateWidget : MonoBehaviour
