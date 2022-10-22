@@ -23,12 +23,18 @@ public class ToggleState : MonoBehaviour
         SetState(_toggle.isOn);
     }
 
-    private void SetState(bool isOn)
+    public void SetState(bool isOn)
     {
         if (OnSprite == null || OffSprite == null)
         { return; }
 
         var sprite = (isOn) ? OnSprite : OffSprite;
         target.sprite = sprite;
+    }
+
+    public void ForceToggleState(bool isOn)
+    {
+        _toggle.SetIsOnWithoutNotify(isOn);
+        SetState(isOn);
     }
 }

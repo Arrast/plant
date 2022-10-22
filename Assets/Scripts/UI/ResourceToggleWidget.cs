@@ -6,8 +6,7 @@ public class ResourceToggleWidget : MonoBehaviour
 {
     private const string uiSpritesFolder = "Sprites/UI/";
 
-    [SerializeField]
-    private PlantStat plantStat;
+    public PlantStat PlantStat;
 
     [SerializeField]
     private ToggleState toggleComponent;
@@ -23,7 +22,7 @@ public class ResourceToggleWidget : MonoBehaviour
         if (assetManager == null)
         { return; }
 
-        string baseSpritePath = uiSpritesFolder + $"resource_button_{plantStat.ToString().ToLower()}";
+        string baseSpritePath = uiSpritesFolder + $"resource_button_{PlantStat.ToString().ToLower()}";
         var onSprite = await assetManager.LoadAsset<Sprite>(baseSpritePath + "_on");
         var offSprite = await assetManager.LoadAsset<Sprite>(baseSpritePath + "_off");
 
@@ -35,8 +34,13 @@ public class ResourceToggleWidget : MonoBehaviour
         toggleComponent.Init(isOn);
     }
 
+    public void SetState(bool isOn)
+    {
+        toggleComponent.ForceToggleState(isOn);
+    }
+
     public void OnResourceChanged(bool isOn)
     {
-        _onStateChanged?.Invoke(plantStat, isOn);
+        _onStateChanged?.Invoke(PlantStat, isOn);
     }
 }

@@ -1447,7 +1447,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ac72fbc68c380c4f928b0f0e3874142, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  plantStat: 2
+  PlantStat: 2
   toggleComponent: {fileID: 1372084154226762546}
 --- !u!114 &7513672671099261362 stripped
 MonoBehaviour:

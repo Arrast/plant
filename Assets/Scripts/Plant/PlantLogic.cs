@@ -34,6 +34,25 @@ namespace versoft.plant.game_logic
             _plantSavedData = (PlantSavedData)plantSavedData.Clone();
             _plantModel = plantModel;
             _gameTimeManager = ServiceLocator.Instance.Get<GameTimeManager>();
+            InitializePlantModifiers();
+        }
+
+        private void InitializePlantModifiers()
+        {
+            var plantManager = ServiceLocator.Instance.Get<PlantManager>();
+            foreach (var plantStat in _plantSavedData.ActiveMultipliers)
+            {
+                var modifierFunction = plantManager.GetModifierForStat(plantStat);
+                if (modifierFunction != null)
+                {
+                    _plantStatModifiers.Add(plantStat, modifierFunction);
+                }
+            }
+        }
+
+        public bool HasModifierForStat(PlantStat plantStat)
+        {
+            return _plantStatModifiers.ContainsKey(plantStat);
         }
 
         private float GetStatChangeForPlantStat(PlantStat stat, float timeElapsed)
@@ -194,11 +213,13 @@ namespace versoft.plant.game_logic
         public void AddModifierForStat(PlantStat plantStat, Func<float> modifierFunction)
         {
             _plantStatModifiers.Add(plantStat, modifierFunction);
+            _plantSavedData.ToggleActiveMultiplier(plantStat, true);
         }
 
         public void RemoveModifierForStat(PlantStat plantStat)
         {
             _plantStatModifiers.Remove(plantStat);
+            _plantSavedData.ToggleActiveMultiplier(plantStat, false);
         }
     }
 }

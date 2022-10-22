@@ -96,12 +96,27 @@ public class HudWindowController : WindowController
 
     private void PlantSelected(PlantLogic selectedPlant)
     {
+        if (plantResourceToggleWidgets != null)
+        {
+            foreach (var widget in plantResourceToggleWidgets)
+            {
+                bool hasStat = (selectedPlant == null) ? false : selectedPlant.HasModifierForStat(widget.PlantStat);
+                widget.SetState(hasStat);
+            }
+        }
         UpdatePlantStats();
     }
 
     public void DeselectPlant()
     {
         _gameManager.DeselectPlant();
+        if (plantResourceToggleWidgets != null)
+        {
+            foreach (var widget in plantResourceToggleWidgets)
+            {
+                widget.SetState(false);
+            }
+        }
     }
 
     private void UpdatePlantStats()

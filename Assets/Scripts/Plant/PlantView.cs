@@ -50,7 +50,9 @@ public class PlantView : MonoBehaviour
         SetPlantStage(plantSavedData.PlantStage);
         SetPlantAlive(plantSavedData.Alive);
         UpdateShadow(_gameTimeManager.GetTimeOfDayFromTime());
-        SetSunScreen(false);
+
+        bool isSunscreenOn = plantSavedData.ActiveMultipliers.Contains(PlantStat.Light);
+        SetSunScreen(isSunscreenOn);
     }
 
     private void UpdateShadow(TimeOfDayEnum timeOfDay)

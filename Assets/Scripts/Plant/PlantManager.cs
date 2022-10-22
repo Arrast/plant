@@ -156,6 +156,8 @@ public class PlantManager : MonoBehaviour
                 selectedPlant = i;
             }
         }
+
+        OnPlantSelected?.Invoke(SelectedPlant);
     }
 
     public void DeselectPlant()
@@ -181,7 +183,7 @@ public class PlantManager : MonoBehaviour
         }
     }
 
-    private Func<float> GetModifierForStat(PlantStat plantStat)
+    public Func<float> GetModifierForStat(PlantStat plantStat)
     {
         switch (plantStat)
         {

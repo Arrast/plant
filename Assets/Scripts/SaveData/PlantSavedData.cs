@@ -1,5 +1,6 @@
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 
 namespace versoft.plant.game_logic
 {
@@ -39,6 +40,9 @@ namespace versoft.plant.game_logic
         [JsonProperty("alive")]
         public bool Alive = true;
 
+        [JsonProperty("ActiveMultipliers")]
+        public List<PlantStat> ActiveMultipliers = new List<PlantStat>();
+
         public object Clone()
         {
             var clone = new PlantSavedData()
@@ -53,7 +57,8 @@ namespace versoft.plant.game_logic
                 PlantStage = this.PlantStage,
                 PlantLifetime = this.PlantLifetime,
                 TimeInBadConditions = this.TimeInBadConditions,
-                Alive = this.Alive
+                Alive = this.Alive,
+                ActiveMultipliers = new List<PlantStat>(this.ActiveMultipliers)
             };
             return clone;
         }
@@ -71,6 +76,28 @@ namespace versoft.plant.game_logic
                 case PlantStat.Water:
                     Water = Math.Clamp(Water - value, 0, Const.MaxPlantValue);
                     break;
+            }
+        }
+
+        public void ToggleActiveMultiplier(PlantStat plantStat, bool enable)
+        {
+            if (enable)
+            {
+                if (ActiveMultipliers.Contains(plantStat))
+                {
+                    UnityEngine.Debug.LogError($"{plantStat} is already in the list of active multipliers");
+                    return;
+                }
+                ActiveMultipliers.Add(plantStat);
+            }
+            else
+            {
+                if (!ActiveMultipliers.Contains(plantStat))
+                {
+                    UnityEngine.Debug.LogError($"{plantStat} is not in the list of active multipliers");
+                    return;
+                }
+                ActiveMultipliers.Remove(plantStat);
             }
         }
 
