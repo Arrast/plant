@@ -2,7 +2,10 @@
 public static class Const
 {
     public const string PrefabsFolder = "Prefabs/";
-    public const string AnimationFolder = "Animations/";
+    public const string AnimationFolder = "Animations/"; 
+    
+    public const string DefaultPlantAsset = "generic_plant";
+    public static string PlantAssetPath = versoft.asset_manager.Const.BaseAddressablesAddress +  "Sprites/Game Assets/Plants/";
 
     // The lifetime in Days
     public static float PlantLifetime = 3;

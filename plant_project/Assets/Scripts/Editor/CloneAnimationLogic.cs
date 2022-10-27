@@ -4,16 +4,26 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-public class AnimationFolderInformation
+public class PlantContentFolderInformation
 {
     public string PlantName;
-    public List<string> PlantStages = new List<string>();
     public bool Exists;
     public bool Override = false;
 
     public override string ToString()
     {
-        string message = $"{PlantName} - Exists? {Exists} - Stages: ";
+        return $"{PlantName} - Exists? {Exists} - Override: {Override}";
+    }
+}
+
+
+public class AnimationFolderInformation : PlantContentFolderInformation
+{
+    public List<string> PlantStages = new List<string>();
+ 
+    public override string ToString()
+    {
+        string message = base.ToString() + "Stages: ";
         foreach (var stage in PlantStages)
         {
             message += $"{stage} ";
@@ -24,9 +34,7 @@ public class AnimationFolderInformation
 
 public class CloneAnimationLogic
 {
-    private const string PlantAssetPath = "Assets/Addressables/Sprites/Game Assets/Plants/";
     private const string PlantAnimationsPath = "Assets/Addressables/Animations/";
-    private const string DefaultPlantAsset = "generic_plant";
     private const string AnimationPathFormat = PlantAnimationsPath + "{0}/{0}_{1}_idle.anim";
     private const string AnimatorOverrideControllerPathFormat = PlantAnimationsPath + "{0}/{0}.overrideController";
 
@@ -35,11 +43,11 @@ public class CloneAnimationLogic
     {
         List<AnimationFolderInformation> folderInformationList = new List<AnimationFolderInformation>();
 
-        var folders = Directory.GetDirectories(PlantAssetPath);
+        var folders = Directory.GetDirectories(Const.PlantAssetPath);
         foreach (var folder in folders)
         {
-            var plantName = Path.GetRelativePath(PlantAssetPath, folder);
-            if (plantName == DefaultPlantAsset)
+            var plantName = Path.GetRelativePath(Const.PlantAssetPath, folder);
+            if (plantName == Const.DefaultPlantAsset)
             { continue; }
 
             AnimationFolderInformation folderInformation = new AnimationFolderInformation();
@@ -49,7 +57,7 @@ public class CloneAnimationLogic
             var subfolders = Directory.GetDirectories(folder);
             foreach (var stageFolder in subfolders)
             {
-                folderInformation.PlantStages.Add(Path.GetRelativePath(folder, stageFolder).Replace("_stage", ""));
+                folderInformation.PlantStages.Add(Path.GetRelativePath(folder, stageFolder));
             }
 
             folderInformationList.Add(folderInformation);
@@ -80,7 +88,7 @@ public class CloneAnimationLogic
 
     private static AnimationClip CloneAnimation(string targetPlant, string plantState, bool overrideAnimation)
     {
-        string path = string.Format(AnimationPathFormat, DefaultPlantAsset, plantState);
+        string path = string.Format(AnimationPathFormat, Const.DefaultPlantAsset, plantState);
         var animationAsset = AssetDatabase.LoadAssetAtPath<AnimationClip>(path);
         if (animationAsset == null)
         {
@@ -126,7 +134,7 @@ public class CloneAnimationLogic
         List<ObjectReferenceKeyframe> keyFrameList = new List<ObjectReferenceKeyframe>();
         foreach (var keyframe in keyframes)
         {
-            var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(PlantAssetPath + $"{targetPlant}/{plantState}_stage/{keyframe.value.name}.png");
+            var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(Const.PlantAssetPath + $"{targetPlant}/{plantState}/{keyframe.value.name}.png");
             if (sprite == null)
             {
                 Debug.LogError($"We can't find the sprite for {keyframe.value}");
@@ -151,7 +159,7 @@ public class CloneAnimationLogic
 
     private static void CreateAnimationOverrideController(string targetPlant, Dictionary<string, AnimationClip> animations)
     {
-        var path = string.Format(AnimatorOverrideControllerPathFormat, DefaultPlantAsset);
+        var path = string.Format(AnimatorOverrideControllerPathFormat, Const.DefaultPlantAsset);
         var animatorOverrideController = AssetDatabase.LoadAssetAtPath<AnimatorOverrideController>(path);
         if (animatorOverrideController == null)
         { return; }
@@ -166,7 +174,7 @@ public class CloneAnimationLogic
 
         foreach (var animation in animatorOverrideController.animationClips)
         {
-            string animationName = animation.name.Replace(DefaultPlantAsset, targetPlant);
+            string animationName = animation.name.Replace(Const.DefaultPlantAsset, targetPlant);
             if (animations.TryGetValue(animationName, out var animationClip))
             {
                 destinationOverrideController[animation.name] = animationClip;
