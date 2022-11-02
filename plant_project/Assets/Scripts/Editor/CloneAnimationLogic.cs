@@ -47,8 +47,6 @@ public class CloneAnimationLogic
         foreach (var folder in folders)
         {
             var plantName = Path.GetRelativePath(Const.PlantAssetPath, folder);
-            if (plantName == Const.DefaultPlantAsset)
-            { continue; }
 
             AnimationFolderInformation folderInformation = new AnimationFolderInformation();
             folderInformation.Exists = Directory.Exists($"{PlantAnimationsPath}{plantName}");
@@ -97,6 +95,12 @@ public class CloneAnimationLogic
         }
 
         // We try to open the target.
+        string resultClipsPath = ($"{PlantAnimationsPath}{targetPlant}");
+        if (!Directory.Exists(resultClipsPath))
+        {
+            Directory.CreateDirectory(resultClipsPath);
+        }
+
         string resultClipPath = string.Format(AnimationPathFormat, targetPlant, plantState);
         var resultClip = AssetDatabase.LoadAssetAtPath<AnimationClip>(resultClipPath);
         if (resultClip == null)

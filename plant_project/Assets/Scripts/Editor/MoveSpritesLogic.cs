@@ -25,9 +25,6 @@ public static class MoveSpritesLogic
         var folders = Directory.EnumerateDirectories(AssetsPath);
         foreach (var folder in folders)
         {
-            if (Path.GetFileName(folder) == Const.DefaultPlantAsset)
-            { continue; }
-
             if (CheckIfFolderCorrect(folder))
             {
                 bool exists = Directory.Exists(Const.PlantAssetPath + Path.GetFileName(folder));
