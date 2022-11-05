@@ -7,9 +7,6 @@ public static class Const
     public const string DefaultPlantAsset = "generic_plant";
     public static string PlantAssetPath = versoft.asset_manager.Const.BaseAddressablesAddress +  "Sprites/Game Assets/Plants/";
 
-    // The lifetime in Days
-    public static float PlantLifetime = 3;
-
     // The number of hours to deplete one unit
     public static float HoursToDeplete = 3.0f;
 
@@ -21,4 +18,7 @@ public static class Const
     public static float HighResourceThreshold = 1.1f;
     public static float MaxPlantPercentage = 1.25f;
     public static float MaxTimeInBadConditions = 600.0f;
+
+    // Id of the soft currency
+    public static string SoftCurrencyId = "soft_currency";
 }

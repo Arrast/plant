@@ -61,6 +61,7 @@ public class PlantLayoutManager : MonoBehaviour
 
             plantLogic.OnPlantDied += PlantDied;
             plantLogic.OnPlantGrew += PlantGrew;
+            plantLogic.OnPlantGeneratedCurrency += PlantGeneratedCurrency;
 
             plantPositions[plantCount].SafeSetActive(true);
             var plantInstance = Instantiate(plantPrefab);
@@ -77,6 +78,12 @@ public class PlantLayoutManager : MonoBehaviour
         {
             plantPositions[plantCount].SafeSetActive(false);
         }
+    }
+
+    private void PlantGeneratedCurrency(string plantId, int amount)
+    {
+        // We may want to show something in the views...
+        // I'll leave it empty for now.
     }
 
     private void PlantGrew(string plantId, PlantStage plantStage)

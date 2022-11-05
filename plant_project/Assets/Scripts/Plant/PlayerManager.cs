@@ -1,4 +1,5 @@
 
+using System;
 using versoft.asset_manager;
 using versoft.plant.game_logic;
 using versoft.save_data;
@@ -6,10 +7,22 @@ using versoft.save_data;
 public class PlayerManager
 {
     private PlayerSaveData _playerSaveData;
+    private System.Action<int> _onCurrencyModified;
 
     public void Initialize()
     {
         LoadSave();
+    }
+
+    public void AddCurrencyModifiedListener(System.Action<int> onCurrencyModified)
+    {
+        _onCurrencyModified += onCurrencyModified;
+    }
+
+    public void IncreaseCurrency(int currencyIncrease)
+    {
+        _playerSaveData.SoftCurrency += currencyIncrease;
+        _onCurrencyModified?.Invoke(_playerSaveData.SoftCurrency);
     }
 
     public void LoadSave()
@@ -46,5 +59,13 @@ public class PlayerManager
 
         _playerSaveData.PlantStates = plantManager.GetPlants();
         saveDataManager.SaveData(_playerSaveData);
+    }
+
+    public int GetSoftCurrency()
+    {
+        if(_playerSaveData == null) 
+        { return 0; }
+
+        return _playerSaveData.SoftCurrency;
     }
 }

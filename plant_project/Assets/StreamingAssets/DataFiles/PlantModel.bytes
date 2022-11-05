@@ -1,4 +1,4 @@
-Id	ModelId	Stages	LevelUpTimes	LevelUpRewards	Light	Food	Water
-string	string	string[]	float[]	int[]	float	float	float
-generic_plant	generic_plant	bud;sprout;adult	3600;7200	10;25	1	1	1
-spider_plant	spider_plant	bud;sprout;adult	3600;7200	10;25	1	1	1
+Id	ModelId	Stages	LevelUpTimes	LevelUpRewards	Light	Food	Water	TimeToEarnCoin
+string	string	string[]	float[]	int[]	float	float	float	CoinIncrementData
+generic_plant	generic_plant	bud;sprout;adult	3600;7200	10;25	1	1	1	{"TimeToIncrease":10,"Amount":1}
+spider_plant	spider_plant	bud;sprout;adult	3600;7200	10;25	1	1	1	{"TimeToIncrease":10,"Amount":1}

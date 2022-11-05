@@ -27,13 +27,16 @@ namespace versoft.plant.game_logic
         private Dictionary<PlantStat, Func<float>> _plantStatModifiers = new Dictionary<PlantStat, Func<float>>();
         public System.Action<string, PlantStage> OnPlantGrew;
         public System.Action<string, bool> OnPlantDied;
+        public System.Action<string, int> OnPlantGeneratedCurrency;
         private GameTimeManager _gameTimeManager;
+        private float _accumulatedCurrencyGain = 0;
 
         public void Init(PlantSavedData plantSavedData, PlantModel plantModel)
         {
             _plantSavedData = (PlantSavedData)plantSavedData.Clone();
             _plantModel = plantModel;
             _gameTimeManager = ServiceLocator.Instance.Get<GameTimeManager>();
+            _accumulatedCurrencyGain = 0;
             InitializePlantModifiers();
         }
 
@@ -68,12 +71,12 @@ namespace versoft.plant.game_logic
             {
                 case PlantStat.Light:
                     var time = _gameTimeManager.GetTimeOfDayFromTime();
-                    if(time == TimeOfDayEnum.Night)
+                    if (time == TimeOfDayEnum.Night)
                     {
                         value *= -1;
                     }
-                    else if (time == TimeOfDayEnum.Dawn || time == TimeOfDayEnum.Dusk) 
-                    { 
+                    else if (time == TimeOfDayEnum.Dawn || time == TimeOfDayEnum.Dusk)
+                    {
                         value = 0;
                     }
                     break;
@@ -95,22 +98,22 @@ namespace versoft.plant.game_logic
 
             foreach (PlantStat stat in Enum.GetValues(typeof(PlantStat)))
             {
-                if(stat == PlantStat.None) 
+                if (stat == PlantStat.None)
                 { continue; }
 
                 float baseValue = GetStatValue(stat, _plantModel);
                 float value = GetStatValue(stat, _plantSavedData);
-                if(value < baseValue * Const.LowResourceThreshold || value > baseValue * Const.HighResourceThreshold)
+                if (value < baseValue * Const.LowResourceThreshold || value > baseValue * Const.HighResourceThreshold)
                 {
                     plantInBadConditions = true;
                     UnityEngine.Debug.LogError("Que se muere! Que se muere!");
-                }                
+                }
             }
 
             if (plantInBadConditions)
             {
                 _plantSavedData.TimeInBadConditions += timeElapsed;
-                if(_plantSavedData.TimeInBadConditions > Const.MaxTimeInBadConditions)
+                if (_plantSavedData.TimeInBadConditions > Const.MaxTimeInBadConditions)
                 {
                     // Plant Pepsi
                     PlantDead();
@@ -126,30 +129,58 @@ namespace versoft.plant.game_logic
 
         public void Tick(float timeElapsed)
         {
-            if (!_plantSavedData.Alive) 
-            { 
-                return; 
+            if (!_plantSavedData.Alive)
+            {
+                return;
             }
 
             TickPlantStat(PlantStat.Light, timeElapsed * Const.ResourceDepletionPerSecond);
             TickPlantStat(PlantStat.Water, timeElapsed * Const.ResourceDepletionPerSecond);
-            TickPlantStat(PlantStat.Food,  timeElapsed * Const.ResourceDepletionPerSecond);
+            TickPlantStat(PlantStat.Food, timeElapsed * Const.ResourceDepletionPerSecond);
+            TickCurrency(timeElapsed);
             IncreaseLifetime(timeElapsed);
             CheckPlantConditions(timeElapsed);
         }
 
+        private void TickCurrency(float timeElapsed)
+        {
+            if(_plantModel.TimeToEarnCoin == null)
+            {
+                UnityEngine.Debug.LogError("The currency data is null");
+                return;
+            }
+
+            float currencyIncrease = _plantModel.TimeToEarnCoin.Amount * (timeElapsed / _plantModel.TimeToEarnCoin.TimeToIncrease);
+            _accumulatedCurrencyGain += currencyIncrease;
+                        
+            if (_accumulatedCurrencyGain >= _plantModel.TimeToEarnCoin.Amount)
+            {
+                _accumulatedCurrencyGain -= _plantModel.TimeToEarnCoin.Amount;
+                IncreaseCurrency(_plantModel.TimeToEarnCoin.Amount);
+            }
+        }
+
+        private void IncreaseCurrency(int amount)
+        {
+            var playerManager = ServiceLocator.Instance.Get<PlayerManager>();
+            playerManager.IncreaseCurrency(amount);
+            OnPlantGeneratedCurrency?.Invoke(_plantSavedData.PlantInstanceId, amount);
+        }
+
         private void IncreaseLifetime(float timeElapsed)
         {
-            if(_plantSavedData.PlantStage != PlantStage.Grown)
+            if (_plantSavedData.PlantStage != PlantStage.Grown)
             {
                 int plantStage = (int)_plantSavedData.PlantStage;
-                float previousMinTime = (plantStage == 0) ? 0: _plantModel.LevelUpTimes[0];
+                float previousMinTime = (plantStage == 0) ? 0 : _plantModel.LevelUpTimes[0];
                 float timeToLevelUp = _plantModel.LevelUpTimes[plantStage] + previousMinTime;
-               
+
                 if (_plantSavedData.PlantLifetime < timeToLevelUp && _plantSavedData.PlantLifetime + timeElapsed >= timeToLevelUp)
                 {
-                    _plantSavedData.PlantStage += 1; 
+                    int currencyEarned = _plantModel.LevelUpRewards[plantStage];
+                    _plantSavedData.PlantStage += 1;
                     OnPlantGrew?.Invoke(_plantSavedData.PlantInstanceId, _plantSavedData.PlantStage);
+                    IncreaseCurrency(currencyEarned);
                 }
             }
 
@@ -165,7 +196,7 @@ namespace versoft.plant.game_logic
         public PlantSavedData GetPlantSaveData()
         {
             _plantSavedData.LastTimeUpdated = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-            return (PlantSavedData) _plantSavedData.Clone();
+            return (PlantSavedData)_plantSavedData.Clone();
         }
 
         public float GetStatValue(PlantStat stat)
@@ -200,9 +231,9 @@ namespace versoft.plant.game_logic
             float maxStatValue = plantMaxValue * Const.MaxPlantPercentage;
 
             var field = GetFieldForPlantStat<PlantSavedData>(stat);
-            if(field != null)
+            if (field != null)
             {
-                float value = (float) field.GetValue(_plantSavedData);
+                float value = (float)field.GetValue(_plantSavedData);
                 value += increment;
                 value = Math.Clamp(value, 0, maxStatValue);
 

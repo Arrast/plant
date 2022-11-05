@@ -11,4 +11,5 @@ public partial class PlantModel
 	public float Light;
 	public float Food;
 	public float Water;
+	public CoinIncrementData TimeToEarnCoin;
 }

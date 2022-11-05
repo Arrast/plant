@@ -1,8 +1,5 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.ResourceManagement.ResourceProviders.Simulation;
 using versoft.asset_manager;
 
 public class GameTimeManagerListener : MonoBehaviour

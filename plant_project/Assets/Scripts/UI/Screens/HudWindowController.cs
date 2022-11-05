@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -22,6 +23,9 @@ public class HudWindowController : WindowController
     [SerializeField]
     private GameObject selectedPlantOverlay;
 
+    [Header("Top Bar")]
+    [SerializeField] 
+    private CurrencyWidget softCurrencyWidget;
 
     private Dictionary<PlantStat, ResourceUIWidget> _resourceWidgets = new Dictionary<PlantStat, ResourceUIWidget>();
 
@@ -53,6 +57,14 @@ public class HudWindowController : WindowController
         }
     }
 
+    private void UpdateSoftCurrency(int softCurrencyAmount)
+    {
+        if(softCurrencyWidget == null)
+        { return; }
+
+        softCurrencyWidget.UpdateAmount(softCurrencyAmount);
+    }
+
     private void OnResourceToggleChanged(PlantStat plantStat, bool isOn)
     {
         if (_plantManager == null || _gameManager == null)
@@ -82,7 +94,7 @@ public class HudWindowController : WindowController
         }
     }
 
-    public override Task Init(WindowConfig windowConfig)
+    public override async Task Init(WindowConfig windowConfig)
     {
         _gameManager = ServiceLocator.Instance.Get<GameManager>();
         _plantManager = ServiceLocator.Instance.Get<PlantManager>();
@@ -91,7 +103,19 @@ public class HudWindowController : WindowController
             _plantManager.OnTick += UpdatePlantStats;
             _plantManager.OnPlantSelected += PlantSelected;
         }
-        return base.Init(windowConfig);
+
+        var playerManager = ServiceLocator.Instance.Get<PlayerManager>();
+        if (playerManager != null)
+        {
+
+            if (softCurrencyWidget == null)
+            { return; }
+
+            softCurrencyWidget.SetCurrency(Const.SoftCurrencyId, playerManager.GetSoftCurrency());
+            playerManager.AddCurrencyModifiedListener(UpdateSoftCurrency);
+        }
+
+        await base.Init(windowConfig);
     }
 
     private void PlantSelected(PlantLogic selectedPlant)
