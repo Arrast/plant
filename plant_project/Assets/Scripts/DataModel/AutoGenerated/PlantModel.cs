@@ -5,6 +5,7 @@ public partial class PlantModel
 {
 	public string Id;
 	public string ModelId;
+	public Rarity Rarity;
 	public string[] Stages;
 	public float[] LevelUpTimes;
 	public int[] LevelUpRewards;

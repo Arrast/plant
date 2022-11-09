@@ -22,6 +22,7 @@ public class Booter : MonoBehaviour
         ServiceLocator.Instance.Register<SaveDataManager>();
         ServiceLocator.Instance.RegisterMonoBehaviour<PlantManager>();
         ServiceLocator.Instance.Register<PlayerManager>();
+        ServiceLocator.Instance.Register<StoreManager>();
 
         GameObject gameManagerGameObject = new GameObject("Game Manager");
         DontDestroyOnLoad(gameManagerGameObject);

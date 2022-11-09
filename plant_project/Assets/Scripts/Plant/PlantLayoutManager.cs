@@ -80,6 +80,46 @@ public class PlantLayoutManager : MonoBehaviour
         }
     }
 
+    public async void CreatePlant(PlantLogic plantLogic)
+    {
+        var assetManager = ServiceLocator.Instance.Get<AssetManager>();
+        if (assetManager == null)
+        { return; }
+
+        PlantView plantPrefab = await assetManager.LoadAsset<PlantView>(Const.PrefabsFolder + "Plant", instantiate: false);
+        if (plantPrefab == null)
+        { return; }
+
+        int plantCount = -1;
+        for(int i = 0; i < plantPositions.Count; i++)
+        {
+            if (!plantPositions[i].gameObject.activeSelf)
+            {
+                plantCount = i;
+                break;
+            }
+        }
+
+        if(plantCount < 0) 
+        { return; }
+        
+        var plantSaveData = plantLogic.GetPlantSaveData();
+
+        plantLogic.OnPlantDied += PlantDied;
+        plantLogic.OnPlantGrew += PlantGrew;
+        plantLogic.OnPlantGeneratedCurrency += PlantGeneratedCurrency;
+
+        plantPositions[plantCount].SafeSetActive(true);
+        var plantInstance = Instantiate(plantPrefab);
+        plantInstance.transform.SetParent(plantPositions[plantCount]);
+        plantInstance.transform.localPosition = Vector3.zero;
+        plantInstance.transform.localRotation = Quaternion.identity;
+        plantInstance.transform.localScale = Vector3.one;
+        plantInstance.Initialize(plantSaveData);
+
+        _plantViews.Add(plantSaveData.PlantInstanceId, plantInstance);
+    }
+
     private void PlantGeneratedCurrency(string plantId, int amount)
     {
         // We may want to show something in the views...
@@ -88,7 +128,7 @@ public class PlantLayoutManager : MonoBehaviour
 
     private void PlantGrew(string plantId, PlantStage plantStage)
     {
-        if(_plantViews.TryGetValue(plantId, out var plantView))
+        if (_plantViews.TryGetValue(plantId, out var plantView))
         {
             plantView.SetPlantStage(plantStage);
         }
@@ -104,7 +144,7 @@ public class PlantLayoutManager : MonoBehaviour
 
     public void ResetPlantWidgets()
     {
-        foreach(var plantView in _plantViews.Values)
+        foreach (var plantView in _plantViews.Values)
         {
             plantView.ResetButtonState();
         }

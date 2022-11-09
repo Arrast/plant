@@ -36,6 +36,22 @@ public class PlantManager : MonoBehaviour
     public Action OnTick { get; set; }
     public Action<PlantLogic> OnPlantSelected { get; set; }
 
+    public PlantLogic CreateNewPlant(string plantId)
+    {
+        var plantSavedData = CreatePlant(plantId);
+        if(plantSavedData == null) 
+        { return null; }
+
+        var plantLogic = CreatePlantLogic(plantSavedData);
+        if(plantLogic == null) 
+        { return null; }
+
+        _plantSavedData.Add(plantSavedData);
+        _plants.Add(plantLogic);
+
+        return plantLogic;
+    }
+
     private PlantSavedData CreatePlant(string plantId)
     {
         if (string.IsNullOrEmpty(plantId))
@@ -68,6 +84,32 @@ public class PlantManager : MonoBehaviour
         };
     }
 
+    private PlantLogic CreatePlantLogic(PlantSavedData plantSavedData)
+    {
+        if (plantSavedData == null)
+        { return null; }
+
+        var gameDataProvider = ServiceLocator.Instance.Get<DataModelDatabase>();
+        if (gameDataProvider == null)
+        { return null; }
+
+        var plantModel = gameDataProvider.Get<PlantModel>(plantSavedData.PlantId);
+        if (plantModel == null)
+        { return null; }
+
+        PlantLogic plantLogic = new PlantLogic();
+        plantLogic.Init(plantSavedData, plantModel);
+        return plantLogic;
+    }
+
+    private void AddPlantLogicToList(PlantLogic plantLogic)
+    {
+        if (plantLogic == null)
+        { return; }
+
+        _plants.Add(plantLogic);
+    }
+
     private void InitPlants(List<PlantSavedData> savedData)
     {
         if (savedData == null)
@@ -83,15 +125,8 @@ public class PlantManager : MonoBehaviour
 
         foreach (var plantSavedData in savedData)
         {
-            var plantModel = gameDataProvider.Get<PlantModel>(plantSavedData.PlantId);
-            if (plantModel == null)
-            {
-                continue;
-            }
-
-            PlantLogic plantLogic = new PlantLogic();
-            plantLogic.Init(plantSavedData, plantModel);
-            _plants.Add(plantLogic);
+            PlantLogic plantLogic = CreatePlantLogic(plantSavedData);
+            AddPlantLogicToList(plantLogic);
         }
     }
 

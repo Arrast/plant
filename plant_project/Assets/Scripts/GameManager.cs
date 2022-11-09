@@ -33,19 +33,6 @@ public class GameManager : MonoBehaviour
         _mainSceneComponents.Initialize();
     }
 
-    private void Update()
-    {
-        if (Input.GetKey(KeyCode.A))
-        {
-            SetResourceState(PlantStat.Water, true);
-        }
-
-        if (Input.GetKeyUp(KeyCode.A))
-        {
-            SetResourceState(PlantStat.Water, false);
-        }
-    }
-
     // We save when we close the game.
     private void OnApplicationQuit()
     {
@@ -92,5 +79,11 @@ public class GameManager : MonoBehaviour
                 plantView.SetSunScreen(isOn);
                 break;
         }
+    }
+
+    public void GivePlant(string randomPlant)
+    {
+        var plantLogic = _plantManager.CreateNewPlant(randomPlant);
+        _plantLayoutManager.CreatePlant(plantLogic);
     }
 }

@@ -1,6 +1,7 @@
 
 using System;
 using versoft.asset_manager;
+using versoft.data_model;
 using versoft.plant.game_logic;
 using versoft.save_data;
 
@@ -67,5 +68,30 @@ public class PlayerManager
         { return 0; }
 
         return _playerSaveData.SoftCurrency;
+    }
+
+    public bool CanAfford(int amount)
+    {
+        return _playerSaveData.SoftCurrency >= amount;
+    }
+
+    public bool HasSpaceForPlants()
+    {
+        return _playerSaveData.MaxNumberOfPlants > _playerSaveData.PlantStates.Count;
+    }
+
+    public bool CanAcceptPlant(string randomPlant)
+    {
+        var dataModelDatabase = ServiceLocator.Instance.Get<DataModelDatabase>();
+        if (dataModelDatabase == null)
+        { return false; }
+
+
+        return true;
+    }
+
+    public void SpendCurrency(int amount)
+    {
+        _playerSaveData.SoftCurrency -= amount;
     }
 }
