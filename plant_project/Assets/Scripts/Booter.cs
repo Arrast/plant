@@ -10,14 +10,15 @@ public class Booter : MonoBehaviour
     async void Awake()
     {
         var assetManager = new AssetManager();
-        ServiceLocator.Instance.Register<AssetManager>(assetManager);
+        ServiceLocator.Instance.Register(assetManager);
 
         var windowManager = await assetManager.LoadAsset<WindowManager>("Prefabs/MainUI", instantiate: true);
         if (windowManager != null)
         {
-            ServiceLocator.Instance.Register<WindowManager>(windowManager);
+            ServiceLocator.Instance.Register(windowManager);
         }
 
+        ServiceLocator.Instance.Register<RandomManager>();
         ServiceLocator.Instance.Register<DataModelDatabase>();
         ServiceLocator.Instance.Register<SaveDataManager>();
         ServiceLocator.Instance.RegisterMonoBehaviour<PlantManager>();

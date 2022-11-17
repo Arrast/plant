@@ -1,86 +1,90 @@
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using versoft.asset_manager;
 using versoft.data_model;
 
-public class StoreManager 
+public class StoreManager
 {
-    Random random;
+    public const string SeedBucketProductType = "SeedBucket";
 
-    public StoreManager()
-    {
-        // Initialize Random
-        // TODO (victor): Centralize this.
-        random = new Random(Guid.NewGuid().GetHashCode());
-    }
-
-    public void TryPurchasingSeedFromBucket(string bucketId)
+    public void TryPurchasingProduct(string productId)
     {
         var playerManager = ServiceLocator.Instance.Get<PlayerManager>();
         if (playerManager == null)
         { return; }
-        
+
         var dataModelDatabase = ServiceLocator.Instance.Get<DataModelDatabase>();
         if (dataModelDatabase == null)
         { return; }
 
-        var storeInfo = dataModelDatabase.Get<Store>(bucketId);
-        if (storeInfo == null)
+        var product = dataModelDatabase.Get<Products>(productId);
+        if (product == null)
         { return; }
 
         var gameManager = ServiceLocator.Instance.Get<GameManager>();
         if (gameManager == null)
         { return; }
 
-        if (!playerManager.CanAfford(storeInfo.Cost))
+        if (!playerManager.CanAfford(product.Cost))
         {
-            UnityEngine.Debug.LogError($"Can't afford pulling from {bucketId}");
+            UnityEngine.Debug.LogError($"Can't afford pulling from {productId}");
             return;
         }
 
-        if (!playerManager.HasSpaceForPlants())
+        if (!CanPurchaseProduct(product))
         {
-            UnityEngine.Debug.LogError("There's no room for new plants");
+            UnityEngine.Debug.LogError($"Can't purchase this product {productId}");
             return;
         }
 
+        if (TryGivingReward(product))
+        {
+            playerManager.SpendCurrency(product.Cost);
+        }
+    }
+
+    private bool TryGivingReward(Products product)
+    {
+        if (product.ProductType == SeedBucketProductType)
+        {
+            return TryGivingPlant(product);
+        }
+        return false;
+    }
+
+    private bool TryGivingPlant(Products product)
+    {
+        var gameManager = ServiceLocator.Instance.Get<GameManager>();
+        var playerManager = ServiceLocator.Instance.Get<PlayerManager>();
+
+        string plantBucketId = product.ProductReference;
         int numberOfTries = 0;
         string randomPlant;
         do
         {
-            randomPlant = GetRandomSeed(bucketId);
-            numberOfTries ++;
+            randomPlant = GetRandomSeed(plantBucketId);
+            numberOfTries++;
         }
         while (!playerManager.CanAcceptPlant(randomPlant) && numberOfTries < 5);
 
         if (string.IsNullOrEmpty(randomPlant))
         {
             UnityEngine.Debug.LogError("We couldn't give a plant to the user");
-            return;
+            return false;
         }
 
-        playerManager.SpendCurrency(storeInfo.Cost);
         gameManager.GivePlant(randomPlant);
+        return true;
     }
 
-    public List<string> GetStoreBucketsList()
+    private bool CanPurchaseProduct(Products product)
     {
-        var dataModelDatabase = ServiceLocator.Instance.Get<DataModelDatabase>();
-        if (dataModelDatabase == null)
-        { return null; }
-
-        var storeInfo = dataModelDatabase.GetList<Store>();
-        if (storeInfo == null)
-        { return null; }
-
-        List<string> list = new List<string>();
-        foreach(var store in storeInfo)
+        if (product.ProductType == SeedBucketProductType)
         {
-            list.Add(store.Id);
+            var playerManager = ServiceLocator.Instance.Get<PlayerManager>();
+            return playerManager.HasSpaceForPlants();
         }
 
-        return list;
+        return false;
     }
 
     public string GetRandomSeed(string bucketId)
@@ -89,18 +93,22 @@ public class StoreManager
         if (dataModelDatabase == null)
         { return string.Empty; }
 
-        var storeInfo = dataModelDatabase.Get<Store>(bucketId);
+        var storeInfo = dataModelDatabase.Get<SeedBucket>(bucketId);
         if (storeInfo == null)
         { return string.Empty; }
 
-        var randomChance = random.Next(0, 10000);
+        var randomManager = ServiceLocator.Instance.Get<RandomManager>();
+        if(randomManager == null) 
+        { return string.Empty; }
+
+        var randomChance = randomManager.GetRandom(0, 10000);
         int accumulated = 0;
-        foreach(var storeBucket in storeInfo.Bucket)
+        foreach (var storeBucket in storeInfo.Bucket)
         {
-            accumulated += (int) Math.Round(storeBucket.Rate * 100);
-            if(accumulated >= randomChance)
-            { 
-                return storeBucket.PlantId; 
+            accumulated += (int)Math.Round(storeBucket.Rate * 100);
+            if (accumulated >= randomChance)
+            {
+                return storeBucket.PlantId;
             }
         }
 

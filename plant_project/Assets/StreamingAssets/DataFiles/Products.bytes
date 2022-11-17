@@ -1,0 +1,4 @@
+Id	Cost	ProductType	ProductReference	Icon
+string	int	string	string	string
+product_1	100	SeedBucket	basic_seeds	
+product_2	550	SeedBucket	premium_seeds	

@@ -1,4 +1,0 @@
-Id	Cost	Bucket
-string	int	StoreBucketData[]
-basic_seeds	100	{"PlantId":"generic_plant","Rate":33.33};{"PlantId":"spider_plant","Rate":33.33};{"PlantId":"tomato_plant","Rate":33.33}
-premium_seeds	550	{"PlantId":"generic_plant","Rate":27.78};{"PlantId":"spider_plant","Rate":27.78};{"PlantId":"tomato_plant","Rate":27.78};{"PlantId":"fire_stick_plant","Rate":5.56};{"PlantId":"cactus_plant","Rate":11.11}

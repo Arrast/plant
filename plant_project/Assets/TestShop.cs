@@ -18,31 +18,11 @@ public class TestShop : MonoBehaviour
         }
     }
 
-    private List<string> bucketList;
-    private List<string> BucketList
+    private void Update()
     {
-        get
+        if (Input.GetKeyUp(KeyCode.A)) 
         {
-            if (bucketList == null)
-            {
-                bucketList = StoreManager.GetStoreBucketsList();
-            }
-            return bucketList;
-        }
-    }
-    
-    // Update is called once per frame
-    void Update()
-    {
-        if (Input.GetKeyUp(KeyCode.A))
-        {
-            if (BucketList != null && BucketList.Count > 0)
-            {
-                var bucketIndex = Random.Range(0, BucketList.Count);
-                StoreManager.TryPurchasingSeedFromBucket(BucketList[bucketIndex]);
-                // string randomPlant = StoreManager.GetRandomSeed(BucketList[bucketIndex]);
-                // UnityEngine.Debug.LogError($"I pulled {randomPlant} from {BucketList[bucketIndex]}");
-            }
+            StoreManager.TryPurchasingProduct("product_1");
         }
     }
 }
