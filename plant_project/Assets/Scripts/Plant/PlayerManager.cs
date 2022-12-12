@@ -38,10 +38,25 @@ public class PlayerManager
         if (_playerSaveData == null)
         {
             _playerSaveData = new PlayerSaveData();
+            BuildPlantLayoutSaveData();
         }
 
         var plantManager = ServiceLocator.Instance.Get<PlantManager>();
         plantManager.LoadPlantsFromSaveData(_playerSaveData);
+    }
+
+    private void BuildPlantLayoutSaveData()
+    {
+        if (_playerSaveData == null)
+        {
+            return;
+        }
+
+        _playerSaveData.PlantLayout = new PlantLayoutSaveData();
+        _playerSaveData.PlantLayout.Add("default_position", new PlantLayoutElementSaveData(true, 3));
+        _playerSaveData.PlantLayout.Add("left_position",    new PlantLayoutElementSaveData());
+        _playerSaveData.PlantLayout.Add("center_position",  new PlantLayoutElementSaveData());
+        _playerSaveData.PlantLayout.Add("right_position",   new PlantLayoutElementSaveData());
     }
 
     public void SaveToFile()
@@ -59,12 +74,13 @@ public class PlayerManager
         }
 
         _playerSaveData.PlantStates = plantManager.GetPlants();
+        _playerSaveData.PlantLayout = plantManager.GetLayout();
         saveDataManager.SaveData(_playerSaveData);
     }
 
     public int GetSoftCurrency()
     {
-        if(_playerSaveData == null) 
+        if (_playerSaveData == null)
         { return 0; }
 
         return _playerSaveData.SoftCurrency;

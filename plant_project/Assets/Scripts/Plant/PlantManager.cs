@@ -1,17 +1,15 @@
-using Mono.Cecil.Cil;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using versoft.asset_manager;
 using versoft.data_model;
 using versoft.plant.game_logic;
-using versoft.save_data;
 
 public class PlantManager : MonoBehaviour
 {
     private List<PlantLogic> _plants = new List<PlantLogic>();
-    private List<PlantSavedData> _plantSavedData;
+    private List<PlantSaveData> _plantSavedData;
+    private PlantLayoutSaveData _plantLayoutSaveData;
 
     // This will be necessary when we have multiple plants.
     private int selectedPlant = -1;
@@ -39,12 +37,14 @@ public class PlantManager : MonoBehaviour
     public PlantLogic CreateNewPlant(string plantId)
     {
         var plantSavedData = CreatePlant(plantId);
-        if(plantSavedData == null) 
+        if (plantSavedData == null)
         { return null; }
 
         var plantLogic = CreatePlantLogic(plantSavedData);
-        if(plantLogic == null) 
+        if (plantLogic == null)
         { return null; }
+
+        AddNewPlantToFirstEmptyLayoutSlot(plantSavedData.PlantInstanceId);
 
         _plantSavedData.Add(plantSavedData);
         _plants.Add(plantLogic);
@@ -52,7 +52,40 @@ public class PlantManager : MonoBehaviour
         return plantLogic;
     }
 
-    private PlantSavedData CreatePlant(string plantId)
+    private void AddNewPlantToFirstEmptyLayoutSlot(string plantInstanceId)
+    {
+        var slot = GetFirstEmptyLayoutSlot();
+        if (slot == null)
+        { return; }
+
+        _plantLayoutSaveData.Positions[slot.Item1].PlantIds.Add(plantInstanceId);
+    }
+
+    private Tuple<string, int> GetFirstEmptyLayoutSlot()
+    {
+        if (_plantLayoutSaveData == null)
+        {
+            UnityEngine.Debug.LogError("We don't have a Layout Save Data... That shouldn't be happening");
+            return null;
+        }
+
+        foreach (var (positionId, positionSaveData) in _plantLayoutSaveData.Positions)
+        {
+            if (!positionSaveData.Unlocked)
+            {
+                continue;
+            }
+
+            if (positionSaveData.PlantIds.Count < positionSaveData.MaxNumberOfPlants)
+            {
+                return new Tuple<string, int>(positionId, positionSaveData.PlantIds.Count);
+            }
+        }
+
+        return null;
+    }
+
+    private PlantSaveData CreatePlant(string plantId)
     {
         if (string.IsNullOrEmpty(plantId))
         {
@@ -73,7 +106,7 @@ public class PlantManager : MonoBehaviour
 
 
         long epochTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-        return new PlantSavedData
+        return new PlantSaveData
         {
             LastTimeUpdated = epochTime,
             PlantId = plantId,
@@ -84,7 +117,7 @@ public class PlantManager : MonoBehaviour
         };
     }
 
-    private PlantLogic CreatePlantLogic(PlantSavedData plantSavedData)
+    private PlantLogic CreatePlantLogic(PlantSaveData plantSavedData)
     {
         if (plantSavedData == null)
         { return null; }
@@ -110,7 +143,7 @@ public class PlantManager : MonoBehaviour
         _plants.Add(plantLogic);
     }
 
-    private void InitPlants(List<PlantSavedData> savedData)
+    private void InitPlants(List<PlantSaveData> savedData)
     {
         if (savedData == null)
         {
@@ -148,10 +181,11 @@ public class PlantManager : MonoBehaviour
 
     public void LoadPlantsFromSaveData(PlayerSaveData playerSaveData)
     {
-        _plantSavedData = new List<PlantSavedData>();
+        _plantLayoutSaveData = (PlantLayoutSaveData)playerSaveData.PlantLayout.Clone();
+        _plantSavedData = new List<PlantSaveData>();
         foreach (var plant in playerSaveData.PlantStates)
         {
-            _plantSavedData.Add((PlantSavedData)plant.Clone());
+            _plantSavedData.Add((PlantSaveData)plant.Clone());
         }
         InitPlants(_plantSavedData);
     }
@@ -166,9 +200,9 @@ public class PlantManager : MonoBehaviour
         plantStatChanged = (increasing) ? plantStat : PlantStat.None;
     }
 
-    public List<PlantSavedData> GetPlants()
+    public List<PlantSaveData> GetPlants()
     {
-        _plantSavedData = new List<PlantSavedData>();
+        _plantSavedData = new List<PlantSaveData>();
         foreach (var plant in _plants)
         {
             _plantSavedData.Add(plant.GetPlantSaveData());
@@ -239,5 +273,10 @@ public class PlantManager : MonoBehaviour
             return 0.5f;
         }
         return 1.0f;
+    }
+
+    public PlantLayoutSaveData GetLayout()
+    {
+        return _plantLayoutSaveData;
     }
 }

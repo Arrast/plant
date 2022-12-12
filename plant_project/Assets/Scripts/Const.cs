@@ -8,17 +8,21 @@ public static class Const
     public static string PlantAssetPath = versoft.asset_manager.Const.BaseAddressablesAddress +  "Sprites/Game Assets/Plants/";
 
     // The number of hours to deplete one unit
-    public static float HoursToDeplete = 3.0f;
+    public const float HoursToDeplete = 3.0f;
 
     // The speed at which resource depletes
     // It should go from 1 to 0 in 3 hours. 
-    public static float ResourceDepletionPerSecond = 1.0f / (HoursToDeplete * 3600);
-    public static float MaxPlantValue = 2.0f;
-    public static float LowResourceThreshold = 0.25f;
-    public static float HighResourceThreshold = 1.1f;
-    public static float MaxPlantPercentage = 1.25f;
-    public static float MaxTimeInBadConditions = 600.0f;
+    public const float ResourceDepletionPerSecond = 1.0f / (HoursToDeplete * 3600);
+    public const float MaxPlantValue = 2.0f;
+    public const float LowResourceThreshold = 0.25f;
+    public const float HighResourceThreshold = 1.1f;
+    public const float MaxPlantPercentage = 1.25f;
+    public const float MaxTimeInBadConditions = 600.0f;
 
     // Id of the soft currency
-    public static string SoftCurrencyId = "soft_currency";
+    public const string SoftCurrencyId = "soft_currency";
+
+    // Max Number of Slots per Area
+    public const int MaxNumberOfPlantsPerZone = 4;
+
 }

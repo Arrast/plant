@@ -23,7 +23,7 @@ public class PlantView : MonoBehaviour
     private string _plantId;
     private GameTimeManager _gameTimeManager;
 
-    public async void Initialize(PlantSavedData plantSavedData)
+    public async void Initialize(PlantSaveData plantSavedData)
     {
         if (plantAnimator == null)
         { return; }

@@ -5,18 +5,26 @@ using UnityEngine;
 using versoft.asset_manager;
 using versoft.plant.game_logic;
 
+
+[System.Serializable]
+public struct PlantLayoutElementHolder
+{
+    public string HolderId;
+    public GameObject HolderGameObject;
+}
+
 public class PlantLayoutManager : MonoBehaviour
 {
     [SerializeField]
-    private List<Transform> plantPositions;
+    private List<PlantLayoutElementHolder> plantLayoutElements;
 
-    [SerializeField]
-    private Transform plantHolderBackground;
+    private List<RectTransform> plantPositions;
 
     private Dictionary<string, PlantView> _plantViews = new Dictionary<string, PlantView>();
+
     public void Initialize()
     {
-        if (plantPositions == null)
+        if (plantLayoutElements == null || plantPositions == null)
         { return; }
 
         var plantManager = ServiceLocator.Instance.Get<PlantManager>();

@@ -22,7 +22,7 @@ namespace versoft.plant.game_logic
 
     public class PlantLogic
     {
-        private PlantSavedData _plantSavedData;
+        private PlantSaveData _plantSavedData;
         private PlantModel _plantModel;
         private Dictionary<PlantStat, Func<float>> _plantStatModifiers = new Dictionary<PlantStat, Func<float>>();
         public System.Action<string, PlantStage> OnPlantGrew;
@@ -31,9 +31,9 @@ namespace versoft.plant.game_logic
         private GameTimeManager _gameTimeManager;
         private float _accumulatedCurrencyGain = 0;
 
-        public void Init(PlantSavedData plantSavedData, PlantModel plantModel)
+        public void Init(PlantSaveData plantSavedData, PlantModel plantModel)
         {
-            _plantSavedData = (PlantSavedData)plantSavedData.Clone();
+            _plantSavedData = (PlantSaveData)plantSavedData.Clone();
             _plantModel = plantModel;
             _gameTimeManager = ServiceLocator.Instance.Get<GameTimeManager>();
             _accumulatedCurrencyGain = 0;
@@ -193,10 +193,10 @@ namespace versoft.plant.game_logic
             ModifyStat(stat, increment);
         }
 
-        public PlantSavedData GetPlantSaveData()
+        public PlantSaveData GetPlantSaveData()
         {
             _plantSavedData.LastTimeUpdated = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-            return (PlantSavedData)_plantSavedData.Clone();
+            return (PlantSaveData)_plantSavedData.Clone();
         }
 
         public float GetStatValue(PlantStat stat)
@@ -230,7 +230,7 @@ namespace versoft.plant.game_logic
             float plantMaxValue = GetStatValue(stat, _plantModel);
             float maxStatValue = plantMaxValue * Const.MaxPlantPercentage;
 
-            var field = GetFieldForPlantStat<PlantSavedData>(stat);
+            var field = GetFieldForPlantStat<PlantSaveData>(stat);
             if (field != null)
             {
                 float value = (float)field.GetValue(_plantSavedData);

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace versoft.plant.game_logic
 {
     [System.Serializable]
-    public class PlantSavedData : System.ICloneable
+    public class PlantSaveData : System.ICloneable
     {
         [JsonProperty("plant_id")]
         public string PlantId = "default";
@@ -45,7 +45,7 @@ namespace versoft.plant.game_logic
 
         public object Clone()
         {
-            var clone = new PlantSavedData()
+            var clone = new PlantSaveData()
             {
                 PlantId = this.PlantId,
                 PlantInstanceId = this.PlantInstanceId,
