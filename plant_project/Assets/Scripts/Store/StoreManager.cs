@@ -1,6 +1,7 @@
 using System;
 using versoft.asset_manager;
 using versoft.data_model;
+using versoft.plant.game_logic;
 
 public enum ProductType
 {
@@ -13,6 +14,8 @@ public enum ProductType
 
 public class StoreManager
 {
+    private PurchasesSaveData _purchasesSaveData;
+
     public void TryPurchasingProduct(string productId)
     {
         var playerManager = ServiceLocator.Instance.Get<PlayerManager>();
@@ -47,6 +50,8 @@ public class StoreManager
         {
             playerManager.SpendCurrency(product.Cost);
         }
+
+        _purchasesSaveData.AddPurchase(productId);
     }
 
     private bool TryGivingReward(Products product)
@@ -143,5 +148,15 @@ public class StoreManager
         }
 
         return string.Empty;
+    }
+
+    public void RestoreSaveData(PlayerSaveData playerSaveData)
+    {
+        _purchasesSaveData = playerSaveData.PurchasesSaveData;
+    }
+
+    public PurchasesSaveData GetPurchasesSaveData()
+    {
+        return _purchasesSaveData;
     }
 }

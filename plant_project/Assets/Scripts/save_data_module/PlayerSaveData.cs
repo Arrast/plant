@@ -10,5 +10,6 @@ namespace versoft.plant.game_logic
         public int MaxNumberOfPlants = 2;
         public string EquippedPlantLayout = "";
         public PlantLayoutSaveData PlantLayout;
+        public PurchasesSaveData PurchasesSaveData;
     }
 }

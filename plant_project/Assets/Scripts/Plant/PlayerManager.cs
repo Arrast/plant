@@ -39,6 +39,8 @@ public class PlayerManager
             BuildPlantLayoutSaveData();
         }
 
+        var storeManager = ServiceLocator.Instance.Get<StoreManager>();
+        storeManager.RestoreSaveData(_playerSaveData);
         var plantManager = ServiceLocator.Instance.Get<PlantManager>();
         plantManager.LoadPlantsFromSaveData(_playerSaveData);
     }
@@ -71,8 +73,15 @@ public class PlayerManager
             return;
         }
 
+        var storeManager = ServiceLocator.Instance.Get<StoreManager>();
+        if (storeManager == null)
+        {
+            return;
+        }
+
         _playerSaveData.PlantStates = plantManager.GetPlants();
         _playerSaveData.PlantLayout = plantManager.GetLayout();
+        _playerSaveData.PurchasesSaveData = storeManager.GetPurchasesSaveData();
         saveDataManager.SaveData(_playerSaveData);
     }
 
