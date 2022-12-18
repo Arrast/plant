@@ -26,5 +26,13 @@ public class TestShop : MonoBehaviour
         {
             StoreManager.TryPurchasingProduct("product_3");
         }
+        if (Input.GetKeyUp(KeyCode.D))
+        {
+            StoreManager.TryPurchasingProduct("product_4");
+        }
+        if (Input.GetKeyUp(KeyCode.F))
+        {
+            StoreManager.TryPurchasingProduct("product_5");
+        }
     }
 }

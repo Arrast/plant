@@ -20,8 +20,6 @@ public class PlantLayoutManager : MonoBehaviour
 
     private Dictionary<string, PlantLayoutElement> plantLayoutElementDict;
 
-    private Dictionary<string, PlantView> _plantViews = new Dictionary<string, PlantView>();
-
     public void Initialize()
     {
         if (plantLayoutElements == null)
@@ -62,9 +60,12 @@ public class PlantLayoutManager : MonoBehaviour
 
     public PlantView GetPlantViewForPlantId(string plantId)
     {
-        if (_plantViews.TryGetValue(plantId, out var plantView))
+        foreach(var (_, plantLayoutElement) in plantLayoutElementDict)
         {
-            return plantView;
+            if(plantLayoutElement.Plantviews.TryGetValue(plantId, out var plantView))
+            {
+                return plantView;
+            }
         }
         return null;
     }
@@ -130,7 +131,8 @@ public class PlantLayoutManager : MonoBehaviour
 
     private void PlantGrew(string plantId, PlantStage plantStage)
     {
-        if (_plantViews.TryGetValue(plantId, out var plantView))
+        var plantView = GetPlantViewForPlantId(plantId);
+        if(plantView != null)
         {
             plantView.SetPlantStage(plantStage);
         }
@@ -138,7 +140,8 @@ public class PlantLayoutManager : MonoBehaviour
 
     private void PlantDied(string plantId, bool alive)
     {
-        if (_plantViews.TryGetValue(plantId, out var plantView))
+        var plantView = GetPlantViewForPlantId(plantId);
+        if (plantView != null)
         {
             plantView.SetPlantAlive(alive);
         }
@@ -146,9 +149,12 @@ public class PlantLayoutManager : MonoBehaviour
 
     public void ResetPlantWidgets()
     {
-        foreach (var plantView in _plantViews.Values)
+        foreach (var (_, plantLayoutElement) in plantLayoutElementDict)
         {
-            plantView.ResetButtonState();
+            foreach(var (_,plantView) in plantLayoutElement.Plantviews)
+            {
+                plantView.ResetButtonState();
+            }
         }
     }
 

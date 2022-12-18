@@ -14,10 +14,12 @@ public class CameraManager : MonoBehaviour
 
     public void ZoomToGameObject(GameObject target, Vector2 offset = new Vector2())
     {
-        Vector2 targetPosition = target.transform.localPosition;
+        Vector2 targetPosition = target.transform.position;
         targetPosition += offset;
         Camera.main.orthographicSize = zoomSize;
-        Camera.main.transform.localPosition = (Vector3)targetPosition + Vector3.back * 10;
+        Camera.main.transform.localPosition = (Vector3)targetPosition;
+
+        Camera.main.transform.localPosition += Vector3.back * 10;
     }
 
     public void ResetCameraValues()
