@@ -84,6 +84,7 @@ public class GameManager : MonoBehaviour
     public void GivePlant(string randomPlant)
     {
         var plantLogic = _plantManager.CreateNewPlant(randomPlant);
-        _plantLayoutManager.CreatePlant(plantLogic);
+        var plantLayoutSaveData = _plantManager.GetLayout();
+        _plantLayoutManager.CreatePlantFromLogic(plantLogic, plantLayoutSaveData);
     }
 }

@@ -15,15 +15,23 @@ namespace versoft.plant.game_logic
         public PlantLayoutElementSaveData()
         {
             Unlocked = false;
-            Skin = "default_position_skin";
+            Skin = "";
             PlantIds = new List<string>();
             MaxNumberOfPlants = Const.MaxNumberOfPlantsPerZone;
         }
 
-        public PlantLayoutElementSaveData(bool unlocked, int maxNumberOfPlants)
+        public PlantLayoutElementSaveData(string defaultSkin)
+        {
+            Skin = defaultSkin;
+            Unlocked = false;
+            PlantIds = new List<string>();
+            MaxNumberOfPlants = Const.MaxNumberOfPlantsPerZone;
+        }
+
+        public PlantLayoutElementSaveData(bool unlocked, int maxNumberOfPlants, string defaultSkin)
         {
             Unlocked = unlocked;
-            Skin = "default_position_skin";
+            Skin = defaultSkin;
             PlantIds = new List<string>();
             MaxNumberOfPlants = maxNumberOfPlants;
         }
@@ -33,11 +41,17 @@ namespace versoft.plant.game_logic
             PlantLayoutElementSaveData clone = new PlantLayoutElementSaveData();
             clone.Unlocked = Unlocked;
             clone.Skin = Skin;
+            clone.MaxNumberOfPlants = MaxNumberOfPlants;
             foreach (var plantId in PlantIds)
             {
                 clone.PlantIds.Add(plantId);
             }
             return clone;
+        }
+
+        public bool IsFull()
+        {
+            return PlantIds.Count == MaxNumberOfPlants;
         }
     }
 

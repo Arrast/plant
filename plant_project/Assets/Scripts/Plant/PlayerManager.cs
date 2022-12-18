@@ -53,10 +53,10 @@ public class PlayerManager
         }
 
         _playerSaveData.PlantLayout = new PlantLayoutSaveData();
-        _playerSaveData.PlantLayout.Add("default_position", new PlantLayoutElementSaveData(true, 3));
-        _playerSaveData.PlantLayout.Add("left_position",    new PlantLayoutElementSaveData());
-        _playerSaveData.PlantLayout.Add("center_position",  new PlantLayoutElementSaveData());
-        _playerSaveData.PlantLayout.Add("right_position",   new PlantLayoutElementSaveData());
+        _playerSaveData.PlantLayout.Add("default_position", new PlantLayoutElementSaveData(true, 3, ""));
+        _playerSaveData.PlantLayout.Add("center_position", new PlantLayoutElementSaveData("default_center_shelf"));
+        _playerSaveData.PlantLayout.Add("left_position", new PlantLayoutElementSaveData("default_tall_shelf"));
+        _playerSaveData.PlantLayout.Add("right_position", new PlantLayoutElementSaveData("default_tall_shelf"));
     }
 
     public void SaveToFile()
@@ -93,7 +93,17 @@ public class PlayerManager
 
     public bool HasSpaceForPlants()
     {
-        return _playerSaveData.MaxNumberOfPlants > _playerSaveData.PlantStates.Count;
+        var plantManager = ServiceLocator.Instance.Get<PlantManager>();
+        var layout = plantManager.GetLayout();
+        foreach (var (_, layoutSaveData) in layout.Positions)
+        {
+            if (layoutSaveData.Unlocked && !layoutSaveData.IsFull())
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public bool CanAcceptPlant(string randomPlant)

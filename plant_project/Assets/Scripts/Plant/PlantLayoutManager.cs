@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using UnityEngine;
 using versoft.asset_manager;
 using versoft.plant.game_logic;
@@ -10,7 +12,7 @@ using versoft.plant.game_logic;
 public struct PlantLayoutElementHolder
 {
     public string HolderId;
-    public GameObject HolderGameObject;
+    public PlantLayoutElement HolderLayoutElement;
 }
 
 public class PlantLayoutManager : MonoBehaviour
@@ -18,27 +20,46 @@ public class PlantLayoutManager : MonoBehaviour
     [SerializeField]
     private List<PlantLayoutElementHolder> plantLayoutElements;
 
-    private List<RectTransform> plantPositions;
+    private Dictionary<string, PlantLayoutElement> plantLayoutElementDict;
 
     private Dictionary<string, PlantView> _plantViews = new Dictionary<string, PlantView>();
 
     public void Initialize()
     {
-        if (plantLayoutElements == null || plantPositions == null)
+        if (plantLayoutElements == null)
         { return; }
 
         var plantManager = ServiceLocator.Instance.Get<PlantManager>();
         if (plantManager == null)
         { return; }
 
+        var plantLayoutSaveData = plantManager.GetLayout();
+        if (plantLayoutSaveData == null)
+        { return; }
+
         var plants = plantManager.GetAllPlantLogic();
-        if (plants == null || plants.Count > plantPositions.Count)
+        if (plants == null)
         {
-            UnityEngine.Debug.LogError("There are more plants that plant positions");
+            UnityEngine.Debug.LogError("There are no plants");
             return;
         }
 
-        InitializePlants(plants);
+        InitializePlantLayout(plantLayoutSaveData);
+        InitializePlants(plantLayoutSaveData, plants);
+    }
+
+    private void InitializePlantLayout(PlantLayoutSaveData plantLayoutSaveData)
+    {
+        plantLayoutElementDict = plantLayoutElements.ToDictionary(plantLayoutElement => plantLayoutElement.HolderId, plantLayoutElement => plantLayoutElement.HolderLayoutElement);
+
+        // Initialize the Layout Elements
+        foreach (var (layoutId, layoutSaveData) in plantLayoutSaveData.Positions)
+        {
+            if (plantLayoutElementDict.TryGetValue(layoutId, out var layoutElement))
+            {
+                layoutElement.Initialize(layoutSaveData);
+            }
+        }
     }
 
     public PlantView GetPlantViewForPlantId(string plantId)
@@ -50,45 +71,16 @@ public class PlantLayoutManager : MonoBehaviour
         return null;
     }
 
-    private async void InitializePlants(List<PlantLogic> plants)
+    private void InitializePlants(PlantLayoutSaveData plantLayoutSaveData, List<PlantLogic> plants)
     {
-        var assetManager = ServiceLocator.Instance.Get<AssetManager>();
-        if (assetManager == null)
-        { return; }
-
-        PlantView plantPrefab = await assetManager.LoadAsset<PlantView>(Const.PrefabsFolder + "Plant", instantiate: false);
-        if (plantPrefab == null)
-        { return; }
-
-
-        int plantCount = 0;
-        for (; plantCount < plants.Count; plantCount++)
+        for (int plantCount = 0; plantCount < plants.Count; plantCount++)
         {
             var plantLogic = plants[plantCount];
-            var plantSaveData = plantLogic.GetPlantSaveData();
-
-            plantLogic.OnPlantDied += PlantDied;
-            plantLogic.OnPlantGrew += PlantGrew;
-            plantLogic.OnPlantGeneratedCurrency += PlantGeneratedCurrency;
-
-            plantPositions[plantCount].SafeSetActive(true);
-            var plantInstance = Instantiate(plantPrefab);
-            plantInstance.transform.SetParent(plantPositions[plantCount]);
-            plantInstance.transform.localPosition = Vector3.zero;
-            plantInstance.transform.localRotation = Quaternion.identity;
-            plantInstance.transform.localScale = Vector3.one;
-            plantInstance.Initialize(plantSaveData);
-
-            _plantViews.Add(plantSaveData.PlantInstanceId, plantInstance);
-        }
-
-        for (; plantCount < plantPositions.Count; plantCount++)
-        {
-            plantPositions[plantCount].SafeSetActive(false);
+            CreatePlantFromLogic(plantLogic, plantLayoutSaveData);
         }
     }
 
-    public async void CreatePlant(PlantLogic plantLogic)
+    public async void CreatePlantFromLogic(PlantLogic plantLogic, PlantLayoutSaveData plantLayoutSaveData)
     {
         var assetManager = ServiceLocator.Instance.Get<AssetManager>();
         if (assetManager == null)
@@ -98,34 +90,38 @@ public class PlantLayoutManager : MonoBehaviour
         if (plantPrefab == null)
         { return; }
 
-        int plantCount = -1;
-        for(int i = 0; i < plantPositions.Count; i++)
-        {
-            if (!plantPositions[i].gameObject.activeSelf)
-            {
-                plantCount = i;
-                break;
-            }
-        }
-
-        if(plantCount < 0) 
-        { return; }
-        
         var plantSaveData = plantLogic.GetPlantSaveData();
 
         plantLogic.OnPlantDied += PlantDied;
         plantLogic.OnPlantGrew += PlantGrew;
         plantLogic.OnPlantGeneratedCurrency += PlantGeneratedCurrency;
 
-        plantPositions[plantCount].SafeSetActive(true);
         var plantInstance = Instantiate(plantPrefab);
-        plantInstance.transform.SetParent(plantPositions[plantCount]);
-        plantInstance.transform.localPosition = Vector3.zero;
-        plantInstance.transform.localRotation = Quaternion.identity;
-        plantInstance.transform.localScale = Vector3.one;
+        SetPlantPosition(plantSaveData.PlantInstanceId, plantInstance, plantLayoutSaveData);
         plantInstance.Initialize(plantSaveData);
+    }
 
-        _plantViews.Add(plantSaveData.PlantInstanceId, plantInstance);
+    private void SetPlantPosition(string plantId, PlantView plantInstance, PlantLayoutSaveData plantLayoutSaveData)
+    {
+        Tuple<string, int> plantTarget = null;
+        foreach (var (layoutId, layoutSaveData) in plantLayoutSaveData.Positions)
+        {
+            var index = layoutSaveData.PlantIds.IndexOf(plantId);
+            if (index != -1)
+            {
+                plantTarget = new Tuple<string, int>(layoutId, index);
+                break;
+            }
+        }
+
+        if (plantTarget == null)
+        {
+            UnityEngine.Debug.LogError($"We couldn't find an open spot or the existing spot for plant {plantId}");
+            return;
+        }
+
+        plantLayoutElementDict[plantTarget.Item1].SetPlant(plantId, plantInstance, plantTarget.Item2);
+        
     }
 
     private void PlantGeneratedCurrency(string plantId, int amount)
