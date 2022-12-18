@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using versoft.asset_manager;
 
@@ -20,9 +18,13 @@ public class TestShop : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyUp(KeyCode.A)) 
+        if (Input.GetKeyUp(KeyCode.A))
         {
             StoreManager.TryPurchasingProduct("product_1");
+        }
+        if (Input.GetKeyUp(KeyCode.S))
+        {
+            StoreManager.TryPurchasingProduct("product_3");
         }
     }
 }

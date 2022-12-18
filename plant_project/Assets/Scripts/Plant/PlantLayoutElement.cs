@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 using versoft.asset_manager;
 using versoft.plant.game_logic;
@@ -21,10 +19,11 @@ public class PlantLayoutElement : MonoBehaviour
 
     public void Initialize(PlantLayoutElementSaveData layoutSaveData)
     {
+        plantHolderBackground.SafeSetActive(layoutSaveData.Unlocked);
+        gameObject.SetActive(layoutSaveData.Unlocked);
+         
         if (!layoutSaveData.Unlocked)
         {
-            plantHolderBackground.SafeSetActive(false);
-            gameObject.SetActive(false);
             return;
         }
 

@@ -1,6 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using versoft.asset_manager;
 using versoft.plant.game_logic;
@@ -86,5 +83,11 @@ public class GameManager : MonoBehaviour
         var plantLogic = _plantManager.CreateNewPlant(randomPlant);
         var plantLayoutSaveData = _plantManager.GetLayout();
         _plantLayoutManager.CreatePlantFromLogic(plantLogic, plantLayoutSaveData);
+    }
+
+    public void UnlockShelf(string layoutId)
+    {
+        _plantManager.UnlockLayout(layoutId);
+        _plantLayoutManager.UnlockLayout(layoutId);
     }
 }

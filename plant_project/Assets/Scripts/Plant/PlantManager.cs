@@ -279,4 +279,12 @@ public class PlantManager : MonoBehaviour
     {
         return _plantLayoutSaveData;
     }
+
+    public void UnlockLayout(string layoutId)
+    {
+        if (_plantLayoutSaveData.Positions.TryGetValue(layoutId, out var layoutSaveData))
+        {
+            layoutSaveData.Unlocked = true;
+        }
+    }
 }

@@ -1,5 +1,3 @@
-
-using System;
 using versoft.asset_manager;
 using versoft.data_model;
 using versoft.plant.game_logic;
@@ -119,5 +117,14 @@ public class PlayerManager
     public void SpendCurrency(int amount)
     {
         _playerSaveData.SoftCurrency -= amount;
+    }
+
+    public bool HasUnlockedShelf(string productReference)
+    {
+        var plantManager = ServiceLocator.Instance.Get<PlantManager>();
+        var layout = plantManager.GetLayout();
+        var layoutSaveElement = layout.Positions[productReference];
+        return layoutSaveElement.Unlocked;
+
     }
 }

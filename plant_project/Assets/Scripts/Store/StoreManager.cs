@@ -2,10 +2,17 @@ using System;
 using versoft.asset_manager;
 using versoft.data_model;
 
+public enum ProductType
+{
+    SeedBucket,
+    ShelfUnlock,
+    ShelfCosmetic,
+    SunblockCosmetic,
+    PotCosmetic
+}
+
 public class StoreManager
 {
-    public const string SeedBucketProductType = "SeedBucket";
-
     public void TryPurchasingProduct(string productId)
     {
         var playerManager = ServiceLocator.Instance.Get<PlayerManager>();
@@ -44,11 +51,24 @@ public class StoreManager
 
     private bool TryGivingReward(Products product)
     {
-        if (product.ProductType == SeedBucketProductType)
+        switch (product.ProductType)
         {
-            return TryGivingPlant(product);
+            case ProductType.SeedBucket:
+                return TryGivingPlant(product);
+            case ProductType.ShelfUnlock:
+                return TryUnlockingShelf(product);
+            default:
+                return false;
         }
-        return false;
+    }
+
+    private bool TryUnlockingShelf(Products product)
+    {
+        var gameManager = ServiceLocator.Instance.Get<GameManager>();
+        var playerManager = ServiceLocator.Instance.Get<PlayerManager>();
+
+        gameManager.UnlockShelf(product.ProductReference);
+        return true;
     }
 
     private bool TryGivingPlant(Products product)
@@ -78,13 +98,23 @@ public class StoreManager
 
     private bool CanPurchaseProduct(Products product)
     {
-        if (product.ProductType == SeedBucketProductType)
+        switch (product.ProductType)
         {
-            var playerManager = ServiceLocator.Instance.Get<PlayerManager>();
-            return playerManager.HasSpaceForPlants();
+            case ProductType.SeedBucket:
+                {
+                    var playerManager = ServiceLocator.Instance.Get<PlayerManager>();
+                    return playerManager.HasSpaceForPlants();
+                }
+            case ProductType.ShelfUnlock:
+                {
+                    var playerManager = ServiceLocator.Instance.Get<PlayerManager>();
+                    return !playerManager.HasUnlockedShelf(product.ProductReference);
+                }
+            default:
+                {
+                    return false;
+                }
         }
-
-        return false;
     }
 
     public string GetRandomSeed(string bucketId)
@@ -98,7 +128,7 @@ public class StoreManager
         { return string.Empty; }
 
         var randomManager = ServiceLocator.Instance.Get<RandomManager>();
-        if(randomManager == null) 
+        if (randomManager == null)
         { return string.Empty; }
 
         var randomChance = randomManager.GetRandom(0, 10000);

@@ -1,8 +1,6 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using UnityEngine;
 using versoft.asset_manager;
 using versoft.plant.game_logic;
@@ -151,6 +149,22 @@ public class PlantLayoutManager : MonoBehaviour
         foreach (var plantView in _plantViews.Values)
         {
             plantView.ResetButtonState();
+        }
+    }
+
+    public void UnlockLayout(string layoutId)
+    {
+        var plantManager = ServiceLocator.Instance.Get<PlantManager>();
+        if (plantManager == null)
+        { return; }
+
+        var plantLayoutSaveData = plantManager.GetLayout();
+        if (plantLayoutSaveData == null)
+        { return; }
+
+        if (plantLayoutElementDict.TryGetValue(layoutId, out var plantLayoutElement))
+        {
+            plantLayoutElement.Initialize(plantLayoutSaveData.Positions[layoutId]);
         }
     }
 }

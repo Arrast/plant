@@ -1,4 +1,7 @@
 Id	Cost	ProductType	ProductReference	Icon
-string	int	string	string	string
+string	int	ProductType	string	string
 product_1	100	SeedBucket	basic_seeds	
 product_2	550	SeedBucket	premium_seeds	
+product_3	1000	ShelfUnlock	center_position	
+product_4	3000	ShelfUnlock	left_position	
+product_5	5000	ShelfUnlock	right_position	
