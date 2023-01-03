@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using UnityEngine;
 using versoft.asset_manager;
 
@@ -74,6 +75,11 @@ namespace versoft.scene_manager
         }
 
         public virtual void OnWindowClosed()
+        {
+
+        }
+
+        public virtual void WindowOpened()
         {
 
         }

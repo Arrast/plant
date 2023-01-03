@@ -23,6 +23,9 @@ public class HudWindowController : WindowController
     [SerializeField]
     private GameObject selectedPlantOverlay;
 
+    [SerializeField]
+    private GameObject defaultOverlay;
+
     [Header("Top Bar")]
     [SerializeField] 
     private CurrencyWidget softCurrencyWidget;
@@ -147,6 +150,7 @@ public class HudWindowController : WindowController
     {
         PlantLogic selectedPlant = _plantManager.SelectedPlant;
         selectedPlantOverlay.SafeSetActive(selectedPlant != null);
+        defaultOverlay.SafeSetActive(selectedPlant == null);
 
         if (selectedPlant == null)
         {
@@ -158,5 +162,16 @@ public class HudWindowController : WindowController
             float resourceValue = selectedPlant.GetStatValue(pair.Key);
             pair.Value.SetResourceValue(resourceValue);
         }
+    }
+
+    public void OpenShop()
+    {
+        var windowManager = ServiceLocator.Instance.Get<WindowManager>();
+        if(windowManager == null)
+        {
+            return;
+        }
+
+        windowManager.OpenScreen("2.0_Shop", UILayers.Screen, sceneName: "ShopScene");
     }
 }

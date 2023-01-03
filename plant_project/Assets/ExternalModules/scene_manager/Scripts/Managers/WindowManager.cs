@@ -128,6 +128,9 @@ namespace versoft.scene_manager
 
                 // Start the Transition
                 await windowInstance.TransitionIn();
+
+                // Notify the window that the loading has been complete
+                windowInstance.WindowOpened();
             }
             else
             {
@@ -163,6 +166,7 @@ namespace versoft.scene_manager
                 await Task.Delay(100);
             }
 
+            UnityEngine.Debug.LogError(locationOperation.Status);
             if (locationOperation.Result != null && locationOperation.Result.Count > 0)
             {
                 var loadOperation = Addressables.LoadSceneAsync(scenePath);
